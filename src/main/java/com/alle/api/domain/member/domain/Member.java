@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "member")
@@ -48,13 +48,13 @@ public class Member {
     private String profileImageUrl;
 
     @Column
-    private LocalDate lastLoginDate;
+    private LocalDateTime lastLoginDate;
 
     @CreatedDate
-    private LocalDate createdAt;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDate updatedAt;
+    private LocalDateTime lastModifiedDate;
 
 
 
