@@ -45,12 +45,12 @@ tasks.named('test') {
 }
 
 // === Querydsl 빌드 옵션 (선택사항) ===
-def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
+def generated = 'src/main/generated'
 
-sourceSets {
-	main.java.srcDirs += [ querydslDir ]
+tasks.withType(JavaCompile).configureEach {
+	options.getGeneratedSourceOutputDirectory().set(file(generated))
 }
 
 clean.doLast {
-	delete file(querydslDir)
+	delete file(generated)
 }

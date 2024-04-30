@@ -2,6 +2,7 @@ package com.alle.api.global.exception;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ public class ExceptionResponse {
 
     public static ResponseEntity<ExceptionResponse> toResponseEntity(ErrorCode errorCode) {
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
+                .status(HttpStatus.OK)
                 .body(ExceptionResponse.builder()
                         .status(errorCode.getHttpStatus().value())
                         .error(errorCode.getHttpStatus().name())

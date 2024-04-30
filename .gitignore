@@ -167,3 +167,5 @@ gradle-app.setting
 
 *.yml
 application.yml
+
+/src/main/generated/

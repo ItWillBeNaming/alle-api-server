@@ -10,20 +10,26 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static com.alle.api.global.exception.ErrorCode.DUPLICATE_RESOURCE;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { ConstraintViolationException.class, DataIntegrityViolationException.class})
-    protected ResponseEntity<ExceptionResponse> handleDataException() {
-        log.info("handleDataException throw Exception : {}", DUPLICATE_RESOURCE);
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<ExceptionResponse> handleDataException() {
         return ExceptionResponse.toResponseEntity(DUPLICATE_RESOURCE);
     }
 
+//    @Override
+//    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+//            HttpRequestMethodNotSupportedException ex,
+//            HttpHeaders headers, HttpStatus status, final WebRequest request) {
+//        logger.info("HttpRequestMethodNotSupported : ", ex);
+//
+//        return ResponseEntity.badRequest().body(new ExceptionResponse("적합한 HTTP Method로 요청해주세요."));
+//    }
 
-    @ExceptionHandler(value = { ResourceNotFoundException.class })
-    protected ResponseEntity<ExceptionResponse> handleCustomException(ResourceNotFoundException e) {
-        log.info("handleCustomException throw CustomException : {}", e.getErrorCode());
-        return ExceptionResponse.toResponseEntity(e.getErrorCode());
-    }
+//    @ExceptionHandler(value = { ResourceNotFoundException.class })
+//    protected ResponseEntity<ExceptionResponse> handleCustomException(ResourceNotFoundException e) {
+//        log.info("handleCustomException throw CustomException : {}", e.getErrorCode());
+//        return ExceptionResponse.toResponseEntity(e.getErrorCode());
+//    }
 }
