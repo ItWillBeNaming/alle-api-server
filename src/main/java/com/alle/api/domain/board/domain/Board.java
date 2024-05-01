@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.*;
 
 @Entity
@@ -36,6 +39,17 @@ public class Board extends AbstractTimeStamp {
 
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
+
+    @OneToMany(mappedBy = "board")
+    private List<BoardComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board")
+    private List<Like> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board")
+    private List<Favorite> favorites = new ArrayList<>();
+
+
 
 
     public void updateBoard(String title, String content) {
