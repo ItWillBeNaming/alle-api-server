@@ -1,11 +1,17 @@
 package com.alle.api.domain.member.domain;
 
+import com.alle.api.domain.board.domain.Board;
+import com.alle.api.domain.board.domain.BoardComment;
+import com.alle.api.domain.board.domain.Favorite;
+import com.alle.api.domain.board.domain.Like;
+import com.alle.api.domain.promise.domain.PromiseMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import java.util.*;
 
 import java.time.LocalDateTime;
 
@@ -55,6 +61,24 @@ public class Member {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
+
+    @OneToMany(mappedBy = "author")
+    private List<Board> boards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<BoardComment> boardComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Like> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Favorite> favorites = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "member")
+    private List<PromiseMember> promiseMembers = new ArrayList<>();
+
+
 
 
 
