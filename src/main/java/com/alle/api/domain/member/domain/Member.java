@@ -62,7 +62,7 @@ public class Member {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "member")
     private List<Board> boards = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
