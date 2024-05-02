@@ -1,5 +1,6 @@
 package com.alle.api.domain.board.domain;
 
+import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractModifier;
 import com.alle.api.global.domain.AbstractTimeStamp;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.*;
 import static jakarta.persistence.GenerationType.*;
 
 @Entity
@@ -39,6 +41,9 @@ public class Board extends AbstractTimeStamp {
 
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
+
+    @ManyToOne(fetch = LAZY)
+    private Member member;
 
     @OneToMany(mappedBy = "board")
     private List<BoardComment> comments = new ArrayList<>();
