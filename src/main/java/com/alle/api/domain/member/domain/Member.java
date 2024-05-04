@@ -4,13 +4,20 @@ import com.alle.api.domain.board.domain.Board;
 import com.alle.api.domain.board.domain.BoardComment;
 import com.alle.api.domain.board.domain.Favorite;
 import com.alle.api.domain.board.domain.Like;
+import com.alle.api.domain.member.constant.Gender;
+import com.alle.api.domain.member.constant.MemberStatus;
+import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.promise.domain.PromiseMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDate;
 import java.util.*;
 
 import java.time.LocalDateTime;
@@ -20,6 +27,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class Member {
 
     @Id
@@ -42,13 +50,21 @@ public class Member {
     private String lastName;
 
     @Column(nullable = false)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
+
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
 
     @Column(nullable = false, unique = true)
     private String nickName;
 
     @Column(nullable = false)
-    private String birthDay;
+    private LocalDate birthDay;
 
     @Column
     private String profileImageUrl;
@@ -61,6 +77,9 @@ public class Member {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "member")
     private List<Board> boards = new ArrayList<>();
@@ -77,14 +96,6 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<PromiseMember> promiseMembers = new ArrayList<>();
-
-
-
-
-
-
-
-
 
 
 }
