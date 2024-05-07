@@ -14,10 +14,10 @@ public abstract class AbstractTimeStamp {
     private Long id;
 
     @CreatedDate
-    private LocalDateTime createdDate;
+    private LocalDateTime createdTime;
 
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedTime;
 
     @Column(nullable = false)
     private Boolean isDeleted;

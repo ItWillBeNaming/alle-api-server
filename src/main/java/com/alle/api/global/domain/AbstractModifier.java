@@ -17,18 +17,20 @@ public abstract class AbstractModifier {
     private Long id;
 
     @CreatedBy
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     protected Member createdMember;
 
     @LastModifiedBy
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     protected Member lastModifiedMember;
 
     @CreatedDate
-    private LocalDateTime createdDate;
+    private LocalDateTime createdTime;
 
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedTime;
 
     @Column(nullable = false)
     private Boolean isDeleted;

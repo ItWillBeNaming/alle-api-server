@@ -11,11 +11,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static com.alle.api.global.exception.ErrorCode.*;
 
-@RestControllerAdvice
+@RestControllerAdvice()
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ExceptionResponse> handleDataException() {
+    public ResponseEntity<ExceptionResponse> handleDefaultException() {
         return ExceptionResponse.toResponseEntity(DUPLICATE_RESOURCE);
     }
 
