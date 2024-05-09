@@ -7,6 +7,7 @@ import com.alle.api.domain.board.domain.Like;
 import com.alle.api.domain.member.constant.Gender;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
+import com.alle.api.domain.member.constant.SocialType;
 import com.alle.api.domain.promise.domain.PromiseMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,40 +36,53 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 30, unique = true)
-    private String email;
 
     @Column(nullable = false, unique = true)
     private String loginId;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 40)
+//    @Column(nullable = false, length = 40)
     private String firstName;
 
-    @Column(nullable = false, length = 40)
+//    @Column(nullable = false, length = 40)
     private String lastName;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false)
+//    @Column(nullable = false, length = 30, unique = true)
+    private String email;
+
+
+//    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
     @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
+    private String socialId;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    @Column(nullable = false, unique = true)
-    private String nickName;
+//    @Column(nullable = false, unique = true)
+    @Column(name = "nick_name")
+    private String nickname;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private LocalDate birthDay;
 
     @Column
     private String profileImageUrl;
+
+
 
     @Column
     private LocalDateTime lastLoginDate;
@@ -97,5 +112,17 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<PromiseMember> promiseMembers = new ArrayList<>();
 
+
+    public void authorizeUser(){
+        this.role = RoleType.USER;
+    }
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+    }
+
+    public void updateRefreshToken(String updateRefreshToken) {
+        this.refreshToken = updateRefreshToken;
+    }
 
 }
