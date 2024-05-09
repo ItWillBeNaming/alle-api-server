@@ -1,10 +1,7 @@
 package com.alle.api.domain.member.controller;
 
-import com.alle.api.domain.member.dto.request.SignInReq;
 import com.alle.api.domain.member.dto.request.SignUpReq;
 import com.alle.api.domain.member.service.MemberService;
-import com.alle.api.global.exception.ErrorCode;
-import com.alle.api.global.exception.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
