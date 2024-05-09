@@ -21,7 +21,7 @@ import static jakarta.persistence.GenerationType.*;
 @Table(name = "board")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Board extends AbstractTimeStamp {
+public class Board extends AbstractModifier {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -42,9 +42,6 @@ public class Board extends AbstractTimeStamp {
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
 
-    @ManyToOne(fetch = LAZY)
-    private Member member;
-
     @OneToMany(mappedBy = "board")
     private List<BoardComment> comments = new ArrayList<>();
 
@@ -53,8 +50,6 @@ public class Board extends AbstractTimeStamp {
 
     @OneToMany(mappedBy = "board")
     private List<Favorite> favorites = new ArrayList<>();
-
-
 
 
     public void updateBoard(String title, String content) {

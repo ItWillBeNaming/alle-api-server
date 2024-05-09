@@ -2,19 +2,19 @@ package com.alle.api.global.domain;
 
 import com.alle.api.domain.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@Getter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractModifier {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,10 +27,11 @@ public abstract class AbstractModifier {
     protected Member lastModifiedMember;
 
     @CreatedDate
-    private LocalDateTime createdTime;
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDateTime lastModifiedTime;
+    private LocalDateTime lastModifiedDate;
 
     @Column(nullable = false)
     private Boolean isDeleted;

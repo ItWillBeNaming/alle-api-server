@@ -1,33 +1,69 @@
 package com.alle.api.global.exception;
 
-import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static com.alle.api.global.exception.ErrorCode.*;
+import java.security.SignatureException;
 
-@RestControllerAdvice()
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+import static com.alle.api.global.exception.ExceptionCode.*;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    Logger defaultLogger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    Logger exceptionLogger = LoggerFactory.getLogger("ExceptionLogger");
+
+    @ExceptionHandler(AlleException.class)
+    public ResponseEntity<ExceptionResponse> handleAlleException(AlleException ex) {
+        defaultLogger.warn(ex.getMessage());
+        exceptionLogger.warn(ex.getMessage(), ex);
+
+        ExceptionResponse exceptionResponse = ExceptionResponse.from(ex.getExceptionCode());
+
+        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
+    }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ExceptionResponse> handleDefaultException() {
-        return ExceptionResponse.toResponseEntity(DUPLICATE_RESOURCE);
+    public ResponseEntity<ApiResponse> handleDefaultException(Exception ex) {
+        defaultLogger.error(ex.getMessage());
+        exceptionLogger.error(ex.getMessage(), ex);
+
+        // TODO
+        return ResponseEntity.internalServerError().build();
     }
 
-    @ExceptionHandler(value= InvalidParameterException.class)
-    public ResponseEntity<ExceptionResponse> handleInvalidParameterException(InvalidParameterException e) {
-        return ExceptionResponse.toResponseEntity(INVALID_PARAMETER);
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ExceptionResponse> handleSignatureException() {
+
+        ExceptionResponse exceptionResponse = ExceptionResponse.from(INVALID_TOKEN);
+
+        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
     }
 
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<ExceptionResponse> handleMalformedJwtException() {
 
+        ExceptionResponse exceptionResponse = ExceptionResponse.from(MALFORMED_TOKEN);
+        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
+    }
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ExceptionResponse> handleExpiredJwtException() {
 
+        ExceptionResponse exceptionResponse = ExceptionResponse.from(EXPIRED_TOKEN);
+        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
+    }
 
+//    @ExceptionHandler(value= InvalidParameterException.class)
+//    public ResponseEntity<ExceptionResponse> handleInvalidParameterException(InvalidParameterException e) {
+//        return ExceptionResponse.from(INVALID_PARAMETER);
+//    }
 
 //    @Override
 //    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(

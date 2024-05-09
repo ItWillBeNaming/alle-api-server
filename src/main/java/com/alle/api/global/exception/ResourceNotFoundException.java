@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ResourceNotFoundException extends RuntimeException{
 
-    private final ErrorCode errorCode;
+    private final ExceptionCode errorCode;
 
 }

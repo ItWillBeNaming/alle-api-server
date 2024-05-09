@@ -28,8 +28,9 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
+
     @Autowired
-    private  CustomUserDetailsService customUserDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
 
 
     @Bean

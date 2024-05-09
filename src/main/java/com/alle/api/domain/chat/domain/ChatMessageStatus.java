@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 @Entity(name = "chat_message_status")
 public class ChatMessageStatus extends AbstractTimeStamp {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private ChatMessage chatMessage;

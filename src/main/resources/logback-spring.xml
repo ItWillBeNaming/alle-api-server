@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATH" value="./logs"/>
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <property name="CONSOLE_LOG_PATTERN" value="%green(%d{yyyy-MM-dd HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}}) %magenta([%thread]) %clr(%5level) %cyan(%logger) - %yellow(%msg%n)" />
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}} [%thread] %5level %logger - %msg%n" />
+
+    <include resource="console-appender.xml" />
+    <include resource="default-appender.xml" />
+    <include resource="http-appender.xml" />
+    <include resource="error-appender.xml" />
+
+    <logger name="ExceptionLogger" level="WARN" additivity="false">
+        <appender-ref ref="ERROR"/>
+    </logger>
+
+    <logger name="HttpLogger" level="INFO" additivity="false">
+        <appender-ref ref="HTTP"/>
+    </logger>
+
+    <logger name="ConsoleLogger" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

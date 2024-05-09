@@ -1,31 +1,18 @@
 package com.alle.api.global.exception;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ExceptionResponse(HttpStatus httpStatus, String status, Integer code, String message) {
 
-@Getter
-@Builder
-public class ExceptionResponse {
-
-    private final LocalDateTime timeStamp = LocalDateTime.now();
-    private final int status;
-    private final String error;
-    private String code;
-    private final String message;
-
-    public static ResponseEntity<ExceptionResponse> toResponseEntity(ErrorCode errorCode) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ExceptionResponse.builder()
-                        .status(errorCode.getHttpStatus().value())
-                        .error(errorCode.getHttpStatus().name())
-                        .code(errorCode.name())
-                        .message(errorCode.getDetail())
-                        .build()
-                );
+    public static ExceptionResponse from(ExceptionCode errorCode) {
+        return new ExceptionResponse(errorCode.getHttpStatus(), "REJECT", errorCode.getCode(), errorCode.getMessage());
     }
+    @JsonIgnore
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
 }

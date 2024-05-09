@@ -81,17 +81,17 @@ public class Member {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-    @OneToMany(mappedBy = "member")
-    private List<Board> boards = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<BoardComment> boardComments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Like> likes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Favorite> favorites = new ArrayList<>();
+//    @OneToMany(mappedBy = "member")
+//    private List<Board> boards = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<BoardComment> boardComments = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Like> likes = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Favorite> favorites = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "member")

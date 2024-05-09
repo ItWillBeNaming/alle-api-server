@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 @Entity(name = "chat_room_members")
 public class ChatRoomMembers extends AbstractModifier {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private ChatRoom chatRoom;

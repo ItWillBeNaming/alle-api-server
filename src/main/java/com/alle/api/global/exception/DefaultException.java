@@ -3,19 +3,19 @@ package com.alle.api.global.exception;
 
 import lombok.Getter;
 
-@Getter
-public class DefaultException extends RuntimeException{
-    
-    private ErrorCode errorCode;
-
-    public DefaultException(ErrorCode errorCode) {
-        super(errorCode.getDetail());
-        this.errorCode = errorCode;
-    }
-
-    public DefaultException(ErrorCode errorCode, String message) {
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-}
+//@Getter
+//public class DefaultException extends RuntimeException{
+//
+//    private ExceptionCode errorCode;
+//
+//    public DefaultException(ExceptionCode errorCode) {
+//        super(errorCode.getDetail());
+//        this.errorCode = errorCode;
+//    }
+//
+//    public DefaultException(ExceptionCode errorCode, String message) {
+//        super(message);
+//        this.errorCode = errorCode;
+//    }
+//
+//}
