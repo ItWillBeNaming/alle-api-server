@@ -1,4 +1,4 @@
-package com.alle.api.domain.auth.dto.response;
+package com.alle.api.domain.member.dto.response;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
