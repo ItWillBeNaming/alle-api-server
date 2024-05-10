@@ -22,5 +22,10 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/sign-up")
+    public ResponseEntity signUp() {
 
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
 }
