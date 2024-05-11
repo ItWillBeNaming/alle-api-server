@@ -55,9 +55,6 @@ public class Promise {
             this.meetingPlace = meetingPlace;
             this.content = content;
             this.promiseMembers = promiseMembers;
-        } else {
-            // isCancelled가 true인 경우에는 업데이트를 수행하지 않음
-            throw new IllegalStateException("이미 취소된 약속입니다");
         }
     }
 
