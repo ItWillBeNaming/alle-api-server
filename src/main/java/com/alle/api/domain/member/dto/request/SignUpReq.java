@@ -1,6 +1,6 @@
 package com.alle.api.domain.member.dto.request;
 
-import com.alle.api.domain.member.constant.Gender;
+import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -26,8 +26,15 @@ public class SignUpReq {
 
     private RoleType role;
 
+    private String gender;
+
+    private MemberStatus memberStatus;
 
     private String nickname;
+
+    private String birthDay;
+
+    private String email;
 
 
 
