@@ -35,36 +35,48 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
 
     /**
      * 인증 처리 메소드
-     *
+     * <p>
      * UsernamePasswordAuthenticationFilter와 동일하게 UsernamePasswordAuthenticationToken 사용
      * StreamUtils를 통해 request에서 messageBody(JSON) 반환
      * 요청 JSON Example
      * {
-     *    "email" : "aaa@bbb.com"
-     *    "password" : "test123"
+     * "email" : "aaa@bbb.com"
+     * "password" : "test123"
      * }
      * 꺼낸 messageBody를 objectMapper.readValue()로 Map으로 변환 (Key : JSON의 키 -> email, password)
      * Map의 Key(email, password)로 해당 이메일, 패스워드 추출 후
      * UsernamePasswordAuthenticationToken의 파라미터 principal, credentials에 대입
-     *
+     * <p>
      * AbstractAuthenticationProcessingFilter(부모)의 getAuthenticationManager()로 AuthenticationManager 객체를 반환 받은 후
      * authenticate()의 파라미터로 UsernamePasswordAuthenticationToken 객체를 넣고 인증 처리
      * (여기서 AuthenticationManager 객체는 ProviderManager -> SecurityConfig에서 설정)
      */
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        if(request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)  ) {
-            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType()); //ExceptionResponse로 나중에 바꾸기
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        if (request.getContentType() == null || !request.getContentType().startsWith(CONTENT_TYPE)) {
+            throw new AuthenticationServiceException("지원되지 않는 인증 Content-Type: " + request.getContentType());
         }
 
-        String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+        try {
+            String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
 
-        Map<String, String> usernamePasswordMap = objectMapper.readValue(messageBody, Map.class);
+            Map<String, String> usernamePasswordMap = objectMapper.readValue(messageBody, Map.class);
 
-        String email = usernamePasswordMap.get(USERNAME_KEY);
-        String password = usernamePasswordMap.get(PASSWORD_KEY);
+            String email = usernamePasswordMap.get(USERNAME_KEY);
+            String password = usernamePasswordMap.get(PASSWORD_KEY);
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);//principal 과 credentials 전달
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);//principal 과 credentials 전달
 
-        return this.getAuthenticationManager().authenticate(authRequest);    }
+            return this.getAuthenticationManager().authenticate(authRequest);
+
+        } catch (IOException e) {
+            throw new AuthenticationServiceException("잘못된 요청 형식입니다.", e);
+        } catch (AuthenticationException e) {
+            throw new AuthenticationServiceException("인증에 실패했습니다", e);
+        }
+    }
+
 }
+
+
+

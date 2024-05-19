@@ -7,13 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>  {
 
+//    @Query(value = "SELECT * FROM member WHERE login_id = :loginId", nativeQuery = true)
     Optional<Member> findByLoginId(String loginId);
+
+    Optional<Member> findByEmail(String email);
+
 
     Optional<Member> findByNickname(String nickname);
 
     Optional<Member> findByRefreshToken(String refreshToken);
+
 
     /**
      * 소셜 타입과 소셜의 식별값으로 회원 찾는 메소드
@@ -24,5 +29,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
 
     boolean existsByLoginId(String loginId);
-
 }

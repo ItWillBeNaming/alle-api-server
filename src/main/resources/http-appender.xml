@@ -2,7 +2,7 @@
   <appender name="HTTP" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_PATH}/http/http.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>INFO</level>
+      <level>DEBUG</level>
       <onMatch>ACCEPT</onMatch>
       <onMismatch>DENY</onMismatch>
     </filter>

@@ -1,4 +1,5 @@
 package com.alle.api.domain.board.domain;
+import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractModifier;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,9 +18,6 @@ public class BoardComment extends AbstractModifier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
@@ -31,6 +29,13 @@ public class BoardComment extends AbstractModifier {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
     private List<BoardComment> childComments;
 
+    @ManyToOne
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id",nullable = false)
+    private Member member;
 
     // 댓글 또는 대댓글 업데이트 메서드
     public void updateComment(String content) {

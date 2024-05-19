@@ -1,8 +1,10 @@
 package com.alle.api.global.oauth.dto;
 
+import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.constant.SocialType;
 import com.alle.api.domain.member.domain.Member;
+import com.alle.api.global.security.util.PasswordUtil;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -78,6 +80,8 @@ public class OAuthAttributes {
                 .nickname(oauth2UserInfo.getNickname())
                 .profileImageUrl(oauth2UserInfo.getImageUrl())
                 .role(RoleType.GUEST)
+                .status(MemberStatus.Y)
+                .password(PasswordUtil.generateRandomPassword())
                 .build();
     }
 }

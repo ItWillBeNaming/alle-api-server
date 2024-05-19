@@ -3,16 +3,14 @@ package com.alle.api.domain.member.dto.request;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
 
-import java.time.LocalDate;
-
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
-public class SignUpReq {
+public class SocialSignUpReq {
 
     @Email
     private String loginId;
@@ -35,8 +33,5 @@ public class SignUpReq {
     private String birthDay;
 
     private String email;
-
-
-
 
 }

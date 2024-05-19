@@ -169,6 +169,3 @@ gradle-app.setting
 application.yml
 
 /src/main/generated/
-
-###DB###
-*.sql

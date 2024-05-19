@@ -37,7 +37,7 @@ public class Member {
     private Long id;
 
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
 
 //    @Column(nullable = false)
@@ -72,8 +72,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-//    @Column(nullable = false, unique = true)
-    @Column(name = "nick_name")
+//    @Column(name = "nick_name",nullable = false, unique = true)
     private String nickname;
 
 //    @Column(nullable = false)
@@ -81,6 +80,11 @@ public class Member {
 
     @Column
     private String profileImageUrl;
+
+    @Column(name = "map_x")
+    private String mapX;
+    @Column(name = "map_y")
+    private String mapY;
 
 
 
@@ -113,6 +117,8 @@ public class Member {
     private List<PromiseMember> promiseMembers = new ArrayList<>();
 
 
+
+    //소셜 회원유저 RoleType변경시 사용
     public void authorizeUser(){
         this.role = RoleType.USER;
     }
@@ -123,6 +129,24 @@ public class Member {
 
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
+    }
+
+    public void udpateLastLoginDate() {
+        this.updateDate = LocalDateTime.now();
+    }
+
+    public void updateKakaoMember(String firstName, String lastName, String nickname,
+                                                   String email, LocalDate birthDay, Gender gender) {
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.nickname = nickname;
+        this.email = email;
+        this.birthDay = birthDay;
+        this.gender = gender;
+        this.role = RoleType.USER;
+        // 나머지 필드들은 기본값 또는 null로 설정될 것입니다.
+
     }
 
 }
