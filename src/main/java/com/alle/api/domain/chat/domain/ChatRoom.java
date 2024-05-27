@@ -16,7 +16,4 @@ public class ChatRoom extends AbstractModifier {
 
     @Column
     private ChatRoomType type;
-
-    @Column
-    private String lastMessage;
 }

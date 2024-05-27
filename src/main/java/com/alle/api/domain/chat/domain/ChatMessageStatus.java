@@ -25,5 +25,5 @@ public class ChatMessageStatus extends AbstractTimeStamp {
     private Boolean isRead;
 
     @Column
-    private LocalDateTime readTime;
+    private LocalDateTime readDate;
 }
