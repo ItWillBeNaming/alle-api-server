@@ -52,15 +52,18 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
+//    @Column(name = "nick_name",nullable = false, unique = true)
     private String nickname;
 
     private LocalDate birthDay;
 
     private String profileImageUrl;
 
+    @Column(name = "map_x")
     private String mapX;
-
+    @Column(name = "map_y")
     private String mapY;
+
 
     private LocalDateTime lastLoginDate;
 

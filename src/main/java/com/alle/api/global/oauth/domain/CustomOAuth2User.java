@@ -14,7 +14,7 @@ import java.util.Map;
 @Getter
 public class CustomOAuth2User extends DefaultOAuth2User {
 
-    private String email;
+    private String loginId;
     private RoleType role;
 
     /**
@@ -29,7 +29,7 @@ public class CustomOAuth2User extends DefaultOAuth2User {
                             Map<String, Object> attributes, String nameAttributeKey,
                             String loginId, RoleType role) {
         super(authorities, attributes, nameAttributeKey);
-        this.email = loginId;
+        this.loginId = loginId;
         this.role = role;
     }
 }

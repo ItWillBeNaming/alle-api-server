@@ -22,9 +22,6 @@ public class Promise {
     @GeneratedValue(strategy = IDENTITY)
     private Long promiseId;
 
-    @ManyToOne
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
 
     @Column(name = "meeting_name", nullable = false)
     private String name;
@@ -44,8 +41,13 @@ public class Promise {
     @Column(name = "is_cancelled", nullable = false)
     private boolean cancelled = false;
 
+    @ManyToOne
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
+
     @OneToMany(mappedBy = "promise", cascade = CascadeType.ALL)
     private List<PromiseMember> promiseMembers = new ArrayList<>();
+
 
 
     public void updatePromise(String name , LocalDateTime meetingDate,String meetingPlace, String content,List<PromiseMember> promiseMembers) {

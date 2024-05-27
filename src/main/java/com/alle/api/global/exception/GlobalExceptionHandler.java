@@ -3,6 +3,7 @@ package com.alle.api.global.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -42,6 +43,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
     }
+
+    @ExceptionHandler(AuthenticationServiceException.class)
+    public ResponseEntity<ExceptionResponse> handleAuthenticationServiceExcpetion(AuthenticationServiceException e){
+        defaultLogger.warn(e.getMessage());
+        ExceptionResponse exceptionResponse = ExceptionResponse.fromException(INVALID_TOKEN);
+
+        return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
+    }
+
 
     /**
      * Security 관련 Exception Handling인데, 버전이 바뀌었나 import가 안된다.
