@@ -22,5 +22,5 @@ public class ChatRoomMembers extends AbstractModifier {
     private Member member;
 
     @Column
-    private LocalDateTime leftTime;
+    private LocalDateTime leftDate;
 }
