@@ -1,7 +1,9 @@
 package com.alle.api.domain.member.controller;
 
+import com.alle.api.domain.member.dto.request.DeleteRequest;
 import com.alle.api.domain.member.dto.request.SignInReq;
 import com.alle.api.domain.member.dto.request.SignUpReq;
+import com.alle.api.domain.member.dto.request.UpdateReq;
 import com.alle.api.domain.member.dto.response.FindMemberResp;
 import com.alle.api.domain.member.service.MemberService;
 import com.alle.api.global.domain.Response;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +77,65 @@ public class MemberController {
         return Response.success(HttpStatus.OK, "회원 조회 성공", member);
     }
 
+    //TODO:: 사진 수정도 나중에 구현하기
+    @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.",
+            parameters = {
+                    @Parameter(name = "nickname", description = "닉네임", example = "새로운 닉네임", required = true, schema = @Schema(type = "String", implementation = String.class)),
+                    @Parameter(name = "email", description = "이메일", example = "새로운 이메일", schema = @Schema(type = "String", implementation = String.class))
+            })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 수정 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))}),
+            @ApiResponse(responseCode = "401", description = "로그인 실패: 인증에 실패하였습니다.")
+    })
+    @PatchMapping("/me")
+    public Response<Void> updateMember(@RequestBody UpdateReq updateReq) {
+        memberService.updateMember(updateReq);
 
+        return Response.success(HttpStatus.OK, "정보 수정 완료");
+
+    }
+
+
+    @Operation(summary = "로그아웃", description = "쿠키에 저장된 리프레쉬 토큰을 사용하여 로그아웃")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))}),
+            @ApiResponse(responseCode = "400", description = "리프레시 토큰이 쿠키에 없습니다.")
+    })
+    @PostMapping("/logout")
+    public Response<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.extractRefreshToken(request);
+        memberService.logout(refreshToken, response);
+        return Response.success(HttpStatus.OK, "로그아웃 성공");
+
+    }
+
+
+    @Operation(summary = "일반 회원 탈퇴", description = "일반 회원은 비밀번호 확인 후 서비스 탈퇴 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "탈퇴 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))})
+            , @ApiResponse(responseCode = "400", description = "회원이 존재하지 않습니다.")
+    })
+    @DeleteMapping("/me")
+    public Response<Void> deleteMember(@AuthenticationPrincipal CustomUserDetail user,
+                                       @RequestBody DeleteRequest request) {
+        memberService.deleteMember(user.getId(), request);
+        return Response.success(HttpStatus.OK, "일반 회원 탈퇴 성공");
+    }
+
+    @Operation(summary = "소셜 회원 탈퇴", description = "소셜 회원은 재로그인을 통해 검증, 재발급 받은 액세스 토큰을 통해 서비스 탈퇴")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "소셜 회원 탈퇴 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))}),
+            @ApiResponse(responseCode = "400", description = "해당 소셜 회원이 존재하지 않습니다.")
+    })
+    @DeleteMapping("/social/me")
+    public Response<Void> deleteSocialMember(@AuthenticationPrincipal CustomUserDetail user) {
+        memberService.deleteSocialMember(user.getId());
+
+        return Response.success(HttpStatus.OK, "소셜 회원 탈퇴 성공");
+
+    }
 }

@@ -4,6 +4,7 @@ import com.alle.api.domain.member.constant.Gender;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.dto.request.SignUpReq;
+import com.alle.api.domain.member.dto.request.UpdateReq;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -131,5 +132,10 @@ public class Member {
     // 권한 정보를 반환하는 메서드
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(this.role.name()));
+    }
+
+    public void updateInfo(UpdateReq request) {
+        this.nickname = request.getNickname();
+        this.email = request.getEmail();
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 
 //TODO:: 회원연결끊기 리다이렉트 URL설정하고 yml에 추가하기
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2RevokeService {
