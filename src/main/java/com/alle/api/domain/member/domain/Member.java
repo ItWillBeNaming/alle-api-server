@@ -1,14 +1,9 @@
 package com.alle.api.domain.member.domain;
 
-import com.alle.api.domain.board.domain.Board;
-import com.alle.api.domain.board.domain.BoardComment;
-import com.alle.api.domain.board.domain.Favorite;
-import com.alle.api.domain.board.domain.Like;
 import com.alle.api.domain.member.constant.Gender;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
-import com.alle.api.domain.member.constant.SocialType;
-import com.alle.api.domain.promise.domain.PromiseMember;
+import com.alle.api.domain.member.dto.request.SignUpReq;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,12 +12,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDate;
-import java.util.*;
-
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "member")
@@ -36,55 +32,36 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @Column(nullable = false, unique = true)
+    @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
 
-//    @Column(nullable = false)
     private String password;
 
-//    @Column(nullable = false, length = 40)
     private String firstName;
 
-//    @Column(nullable = false, length = 40)
     private String lastName;
 
-//    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-//    @Column(nullable = false, length = 30, unique = true)
     private String email;
 
-
-//    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
     @Enumerated(EnumType.STRING)
-    private SocialType socialType;
-
-    private String socialId;
-
-    @Column(name = "refresh_token")
-    private String refreshToken;
-
-    @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-//    @Column(nullable = false, unique = true)
-    @Column(name = "nick_name")
     private String nickname;
 
-//    @Column(nullable = false)
     private LocalDate birthDay;
 
-    @Column
     private String profileImageUrl;
 
+    private String mapX;
 
+    private String mapY;
 
-    @Column
     private LocalDateTime lastLoginDate;
 
     @CreatedDate
@@ -96,33 +73,60 @@ public class Member {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-//    @OneToMany(mappedBy = "member")
-//    private List<Board> boards = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member")
-//    private List<BoardComment> boardComments = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member")
-//    private List<Like> likes = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member")
-//    private List<Favorite> favorites = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "member")
-    private List<PromiseMember> promiseMembers = new ArrayList<>();
-
-
-    public void authorizeUser(){
-        this.role = RoleType.USER;
+    public static Member of(String email, String nickname, String profileImg, RoleType role) {
+        return Member.builder()
+                .loginId(email)
+                .nickname(nickname)
+                .password("") // 소셜 회원은 비밀번호 X
+                .profileImageUrl(profileImg)
+                .role(role)
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .status(MemberStatus.Y)
+                .build();
     }
 
-    public void encodePassword(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
+    public static Member of(SignUpReq request, String password) {
+        return Member.builder()
+                .loginId(request.getEmail())
+                .nickname(request.getNickname())
+                .password(password)
+                .role(RoleType.MEMBER_NORMAL)
+                .status(MemberStatus.Y)
+                .email(request.getEmail())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .birthDay(LocalDate.now())
+                .profileImageUrl(null)
+                .gender(Gender.valueOf(request.getGender()))
+                .build();
     }
 
-    public void updateRefreshToken(String updateRefreshToken) {
-        this.refreshToken = updateRefreshToken;
+    public static Member of(SignUpReq request, String password, String profileImg) {
+        return Member.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .password(password)
+                .profileImageUrl(profileImg)
+                .role(RoleType.MEMBER_NORMAL)
+                .status(MemberStatus.Y)
+                .email(request.getEmail())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .birthDay(LocalDate.now())
+                .profileImageUrl(null)
+                .gender(Gender.valueOf(request.getGender()))
+                .build();
     }
 
+    public void updateProfile(String name, String picture) {
+        this.profileImageUrl = picture;
+        this.firstName = name;
+    }
+
+    // 권한 정보를 반환하는 메서드
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(this.role.name()));
+    }
 }

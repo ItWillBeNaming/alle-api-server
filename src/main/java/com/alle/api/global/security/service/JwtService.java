@@ -1,173 +1,200 @@
 package com.alle.api.global.security.service;
 
+import com.alle.api.domain.member.domain.Member;
 import com.alle.api.domain.member.repository.MemberRepository;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.alle.api.domain.token.entity.RefreshToken;
+import com.alle.api.domain.token.repository.RefreshTokenRepository;
+import com.alle.api.global.exception.ExceptionCode;
+import com.alle.api.global.exception.JwtException;
+import com.alle.api.global.exception.MemberException;
+import com.alle.api.global.security.CustomUserDetail;
+import com.alle.api.global.security.JwtToken;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
+import java.security.Key;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Getter
+
+@Component
 @Slf4j
 public class JwtService {
 
-    @Value("${jwt.secretKey}")
-    private String secretKey;
 
-    @Value("${jwt.access.expiration}")
-    private Long accessTokenExpirationPeriod;
-
-    @Value("${jwt.refresh.expiration}")
-    private Long refreshTokenExpirationPeriod;
-
-    @Value("${jwt.access.header}")
-    private String accessHeader;
-
-    @Value("${jwt.refresh.header}")
-    private String refreshHeader;
-
-    /**
-     * JWT의 Subject와 Claim으로 email 사용 -> 클레임의 name을 "email"으로 설정
-     * JWT의 헤더에 들어오는 값 : 'Authorization(Key) = Bearer {토큰} (Value)' 형식
-     */
-    private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
-    private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
-    private static final String EMAIL_CLAIM = "email";
-    private static final String BEARER = "Bearer ";
-
+    private final Key key;
+    private final long accessTokenExpirationTime;
+    private final long refreshTokenExpirationTime;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
 
-    /**
-     * AccessToken 생성 메소드
-     */
-    public String createAccessToken(String loginId) {
-        Date now = new Date();
-        return JWT.create() // JWT 토큰을 생성하는 빌더 반환
-                .withSubject(ACCESS_TOKEN_SUBJECT) // JWT의 Subject 지정 -> AccessToken이므로 AccessToken
-                .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod)) // 토큰 만료 시간 설정
 
-                //추가하실 경우 .withClaim(클래임 이름, 클래임 값) 으로 설정하기
-                .withClaim(EMAIL_CLAIM, loginId)
-                .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용, application-jwt.yml에서 지정한 secret 키로 암호화
+    public JwtService(@Value("${jwt.secret}") String secretKey,
+                            @Value("${jwt.token.access-token-expiration-time}") long accessTokenExpirationTime,
+                            @Value("${jwt.token.refresh-token-expiration-time}") long refreshTokenExpirationTime,
+                            RefreshTokenRepository refreshTokenRepository, MemberRepository memberRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.memberRepository = memberRepository;
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.accessTokenExpirationTime = accessTokenExpirationTime;
+        this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
-    /**
-     * RefreshToken 생성
-     * RefreshToken은 Claim에 email도 넣지 않으므로 withClaim() X
-     */
-    public String createRefreshToken() {
-        Date now = new Date();
-        return JWT.create()
-                .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
-                .sign(Algorithm.HMAC512(secretKey));
+
+
+    public JwtToken generateToken(Authentication authentication) {
+        return JwtToken.builder()
+                .grantType("Bearer")
+                .accessToken(generateAccessToken(authentication))
+                .refreshToken(generateRefreshToken(authentication))
+                .build();
     }
 
-    /**
-     * AccessToken 헤더에 실어서 보내기
-     */
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    // 리프레시 토큰을 이용해 액세스 토큰을 재발급
+    public JwtToken reissueTokenByRefreshToken(String oldRefreshToken) {
+        RefreshToken oldRefreshTokenDB = refreshTokenRepository.findByRefreshToken(oldRefreshToken)
+                .orElseThrow(() -> new JwtException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN));
+        Authentication authentication = getAuthenticationFromMemberId(oldRefreshTokenDB.getMemberId());
 
-        response.setHeader(accessHeader, accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
+        // 새로운 토큰 생성
+        String newAccessToken = generateAccessToken(authentication);
+        String newRefreshToken = generateRefreshToken(authentication);
+
+        return JwtToken.builder()
+                .grantType("Bearer")
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 
-    /**
-     * AccessToken + RefreshToken 헤더에 실어서 보내기
-     */
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public Authentication getAuthenticationFromAccessToken(String accessToken) {
+        Claims claims = parseClaims(accessToken);
 
-        setAccessTokenHeader(response, accessToken);
-        setRefreshTokenHeader(response, refreshToken);
-        log.info("Access Token, Refresh Token 헤더 설정 완료");
+        if (claims.get("auth") == null) {
+            throw new JwtException(ExceptionCode.INVALID_TOKEN);
+        }
+
+        // 클레임에서 권한 정보 가져오기
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+        // UserDetails 객체를 만들어서 Authentication return
+        // UserDetails: interface, User: UserDetails를 구현한 class
+        // CustomUserDetail 생성!!
+        CustomUserDetail userDetail = new CustomUserDetail(claims.getSubject(), "",
+                Long.parseLong(String.valueOf(claims.get("id"))), authorities);
+        return new UsernamePasswordAuthenticationToken(userDetail, "", authorities);
     }
 
-    /**
-     * 헤더에서 RefreshToken 추출
-     * 토큰 형식 : Bearer XXX에서 Bearer를 제외하고 순수 토큰만 가져오기 위해서
-     * 헤더를 가져온 후 "Bearer"를 삭제(""로 replace)
-     */
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
-    }
-
-    /**
-     * 헤더에서 AccessToken 추출
-     * 토큰 형식 : Bearer XXX에서 Bearer를 제외하고 순수 토큰만 가져오기 위해서
-     * 헤더를 가져온 후 "Bearer"를 삭제(""로 replace)
-     */
-    public Optional<String> extractAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
-    }
-
-    /**
-     * AccessToken에서 Email 추출
-     * 추출 전에 JWT.require()로 검증기 생성
-     * verify로 AceessToken 검증 후
-     * 유효하다면 getClaim()으로 이메일 추출
-     * 유효하지 않다면 빈 Optional 객체 반환
-     */
-    public Optional<String> extractEmail(String accessToken) {
+    public boolean validateToken(String token) {
         try {
-            // 토큰 유효성 검사하는 데에 사용할 알고리즘이 있는 JWT verifier builder 반환
-            return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
-                    .build() // 반환된 빌더로 JWT verifier 생성
-                    .verify(accessToken) // accessToken을 검증하고 유효하지 않다면 예외 발생
-                    .getClaim(EMAIL_CLAIM) // claim(Emial) 가져오기
-                    .asString());
-        } catch (Exception e) {
-            log.error("액세스 토큰이 유효하지 않습니다.");
-            return Optional.empty();
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT Token", e);
+            throw new JwtException(ExceptionCode.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+            throw new JwtException(ExceptionCode.TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT Token", e);
+            throw new JwtException(ExceptionCode.UNSUPPORTED_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty.", e);
+            throw new JwtException(ExceptionCode.NOT_FOUND_TOKEN);
         }
     }
 
-    /**
-     * AccessToken 헤더 설정
-     */
-    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader(accessHeader, accessToken);
+    private String generateAccessToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        // CustomUserDetail로 형변환 후 꺼내기
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+
+        long now = (new Date()).getTime();
+        Date accessTokenExpiresIn = new Date(now + accessTokenExpirationTime);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("id", customUserDetail.getId())
+                .claim("auth", authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
     }
 
-    /**
-     * RefreshToken 헤더 설정
-     */
-    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader(refreshHeader, refreshToken);
+    private String generateRefreshToken(Authentication authentication) {
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        log.debug("현재 로그인한 사용자의 id: {}", customUserDetail.getId());
+
+        long now = (new Date()).getTime();
+        Date refreshTokenExpiresIn = new Date(now + refreshTokenExpirationTime);
+
+        String refreshToken = Jwts.builder()
+                .setExpiration(refreshTokenExpiresIn)
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+
+        // 사용자 ID로 기존 리프레시 토큰이 있는지 확인
+        refreshTokenRepository.findByMemberId(customUserDetail.getId()).ifPresentOrElse(
+                existingRefreshToken -> {
+                    // 리프레시 토큰이 존재한다면 업데이트
+                    existingRefreshToken.updateRefreshToken(refreshToken);
+                    refreshTokenRepository.save(existingRefreshToken);
+                },
+                () -> {
+                    // 리프레시 토큰 DB 저장 (새로운 토큰)
+                    refreshTokenRepository.save(RefreshToken.of(refreshToken, customUserDetail.getId()));
+                }
+        );
+        return refreshToken;
     }
 
-    /**
-     * RefreshToken DB 저장(업데이트)
-     */
-    public void updateRefreshToken(String loginId, String refreshToken) {
-        memberRepository.findByLoginId(loginId)
-                .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> new Exception("일치하는 회원이 없습니다.")
-                );
+    private Authentication getAuthenticationFromMemberId(Long memberId) {
+        // 회원 ID로 사용자 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(ExceptionCode.NOT_FOUND_MEMBER));
+        GrantedAuthority authority = new SimpleGrantedAuthority(member.getRole().name());
+
+        // 권한 정보를 담을 컬렉션 생성
+        Collection<GrantedAuthority> authorities = Collections.singletonList(authority);
+
+        // CustomUserDetail 객체 생성
+        CustomUserDetail customUserDetail = new CustomUserDetail(member.getEmail(), member.getPassword(),
+                member.getId(), authorities);
+
+        // Authentication 객체 생성 및 반환
+        return new UsernamePasswordAuthenticationToken(customUserDetail, "", authorities);
     }
 
-    public boolean isTokenValid(String token) {
+    private Claims parseClaims(String accessToken) {
         try {
-            JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
-            return true;
-        } catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
-            return false;
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
         }
     }
 

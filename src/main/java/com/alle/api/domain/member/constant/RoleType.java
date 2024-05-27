@@ -6,9 +6,19 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RoleType {
-    GUEST("ROLE_GUEST"),
-    ADMIN("ROLE_ADMIN"),
-    USER("ROLE_USER");
 
-    private final String value;
+    MEMBER_NORMAL,
+    MEMBER_GOOGLE,
+    MEMBER_KAKAO,
+    MEMBER_NAVER,
+    ADMIN;
+
+    public static RoleType of(String provider) {
+        return switch (provider.toLowerCase()) {
+            case "google" -> MEMBER_GOOGLE;
+            case "kakao" -> MEMBER_KAKAO;
+            case "naver" -> MEMBER_NAVER;
+            default -> MEMBER_NORMAL;
+        };
+    }
 }
