@@ -1,5 +1,9 @@
 package com.alle.api.domain.member.controller;
 
+import com.alle.api.global.email.dto.request.AuthCodeVerificationRequest;
+import com.alle.api.global.email.dto.request.EmailRequest;
+import com.alle.api.global.email.service.EmailService;
+import com.alle.api.domain.member.dto.request.UpdatePasswordRequest;
 import com.alle.api.domain.member.dto.request.DeleteRequest;
 import com.alle.api.domain.member.dto.request.SignInReq;
 import com.alle.api.domain.member.dto.request.SignUpReq;
@@ -25,15 +29,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/v1/member")
 @Slf4j
+@RequestMapping("/api/v1/member")
+@RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
+    private final EmailService emailService;
 
     @Operation(summary = "회원 가입", description = "일반 이메일 회원 가입입니다.",
             parameters = {
@@ -137,5 +140,68 @@ public class MemberController {
 
         return Response.success(HttpStatus.OK, "소셜 회원 탈퇴 성공");
 
+    }
+
+    @GetMapping("/reissueToken")
+    public Response<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.extractRefreshToken(request);
+        JwtToken newToken = memberService.reissueToken(refreshToken);
+        response.addHeader("Authorization", newToken.getAccessToken());
+        CookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
+        return Response.success(HttpStatus.OK, "토큰 재발급 성공");
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))}),
+            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패")
+    })
+    @PatchMapping("/password")
+    public Response<Void> updatePassword(@AuthenticationPrincipal CustomUserDetail user,
+                                         @RequestBody @Valid UpdatePasswordRequest request) {
+        memberService.updatePassword(user.getId(), request);
+        return Response.success(HttpStatus.OK, "비밀번호 변경 성공");
+    }
+
+
+    @Operation(summary = "이메일 인증 코드 전송", description = "사용자 이메일로 인증 코드를 전송합니다. 회원 존재 유무도 함께 검사합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 코드 전송 완료",
+                    content = {@Content(schema = @Schema(implementation = Response.class))})
+    })
+    @PostMapping("/send-authCode")
+    public Response<Void> sendEmailAuthCode(@RequestBody @Valid EmailRequest request) {
+        log.info("request={}",request.getEmail());
+        // 회원 인증 후 인증 코드 전송
+        emailService.validateMember(request.getEmail());
+        emailService.sendAuthCode(request.getEmail());
+        return Response.success(HttpStatus.OK, "이메일 인증 코드 전송 완료");
+    }
+
+
+    @Operation(summary = "이메일 인증", description = "사용자 이메일로 보낸 인증 코드를 검증하여 이메일을 인증합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
+                    content = {@Content(schema = @Schema(implementation = Response.class))}),
+            @ApiResponse(responseCode = "400", description = "이메일 인증에 실패하였습니다.",
+            content = {@Content(schema = @Schema(implementation = Response.class))})
+    })
+    @PostMapping("/verify-authCode")
+    public Response<Void> verifyAuthCode(@RequestBody @Valid AuthCodeVerificationRequest request) {
+        emailService.validateAuthCode(request.getEmail(), request.getAuthCode());
+        return Response.success(HttpStatus.OK, "이메일 인증 성공");
+    }
+
+
+    @Operation(summary = "임시 비밀번호 전송", description = "사용자 이메일로 임시 비밀번호를 전송합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "임시 비밀번호 전송 완료",
+                    content = {@Content(schema = @Schema(implementation = Response.class))})
+    })
+    @PostMapping("/send-temporaryPassword")
+    public Response<Void> sendEmailTempPassword(@RequestBody @Valid EmailRequest request) {
+        emailService.sendTemporaryPassword(request.getEmail());
+        return Response.success(HttpStatus.OK, "임시 비밀번호 전송 완료");
     }
 }

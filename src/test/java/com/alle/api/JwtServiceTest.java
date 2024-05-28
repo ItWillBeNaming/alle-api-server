@@ -2,11 +2,10 @@ package com.alle.api;
 
 import com.alle.api.domain.member.repository.MemberRepository;
 import com.alle.api.domain.token.repository.RefreshTokenRepository;
-import com.alle.api.global.exception.JwtException;
+import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.CustomUserDetail;
 import com.alle.api.global.security.JwtToken;
 import com.alle.api.global.security.service.JwtService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +23,6 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class JwtServiceTest {
 

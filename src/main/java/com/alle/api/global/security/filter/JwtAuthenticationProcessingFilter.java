@@ -1,6 +1,6 @@
 package com.alle.api.global.security.filter;
 
-import com.alle.api.global.exception.JwtException;
+import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

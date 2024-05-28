@@ -2,20 +2,16 @@ package com.alle.api.domain.member.service;
 
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
-import com.alle.api.domain.member.dto.request.DeleteRequest;
-import com.alle.api.domain.member.dto.request.SignInReq;
-import com.alle.api.domain.member.dto.request.SignUpReq;
-import com.alle.api.domain.member.dto.request.UpdateReq;
+import com.alle.api.domain.member.dto.request.*;
 import com.alle.api.domain.member.dto.response.FindMemberResp;
 import com.alle.api.domain.member.repository.MemberRepository;
 import com.alle.api.domain.token.repository.SocialAccessTokenRepository;
 import com.alle.api.global.exception.ExceptionCode;
-import com.alle.api.global.exception.MemberException;
+import com.alle.api.global.exception.custom.MemberException;
 import com.alle.api.global.oauth.service.OAuth2RevokeService;
 import com.alle.api.global.security.JwtToken;
 import com.alle.api.global.security.service.JwtService;
 import com.alle.api.global.security.util.JwtUtils;
-import com.nimbusds.oauth2.sdk.client.ClientDeleteRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -127,5 +123,37 @@ public class MemberService {
             case MEMBER_GOOGLE -> oAuth2RevokeService.revokeGoogle(socialAccessToken);
             case MEMBER_NAVER -> oAuth2RevokeService.revokeNaver(socialAccessToken);
         }
+    }
+
+    public JwtToken reissueToken(String refreshToken) {
+        JwtToken jwtToken = jwtService.reissueTokenByRefreshToken(refreshToken);
+        return jwtToken;
+    }
+
+    public void updatePassword(Long id, UpdatePasswordRequest request) {
+        Member findMember = getMemberById(id);
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), findMember.getPassword())) {
+            throw new MemberException(ExceptionCode.INVALID_CURRENT_PASSWORD);
+        }
+
+        validatePassword(request.getNewPassword(), request.getNewPasswordConfirm());
+        findMember.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+
+
+    }
+    private void validatePassword(String password, String passwordConfirm) {
+        if (!password.equals(passwordConfirm)) {
+            throw new MemberException(ExceptionCode.PASSWORD_MISMATCH);
+        }
+    }
+
+    public Object getMemberByLoginIdAndRole(String loginId, RoleType roleType) {
+        return memberRepository.findByLoginIdAndRole(loginId,roleType);
+    }
+
+    public Member getMemberByEmailAndRole(String email, RoleType role) {
+        return memberRepository.findByLoginIdAndRole(email, role)
+                .orElseThrow(() -> new MemberException(ExceptionCode.NOT_FOUND_MEMBER));
     }
 }

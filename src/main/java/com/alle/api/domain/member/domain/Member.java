@@ -93,7 +93,7 @@ public class Member {
 
     public static Member of(SignUpReq request, String password) {
         return Member.builder()
-                .loginId(request.getEmail())
+                .loginId(request.getLoginId())
                 .nickname(request.getNickname())
                 .password(password)
                 .role(RoleType.MEMBER_NORMAL)
@@ -137,5 +137,9 @@ public class Member {
     public void updateInfo(UpdateReq request) {
         this.nickname = request.getNickname();
         this.email = request.getEmail();
+    }
+
+    public void updatePassword(String password) {
+        this.password= password;
     }
 }
