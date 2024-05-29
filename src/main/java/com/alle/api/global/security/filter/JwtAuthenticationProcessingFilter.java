@@ -1,5 +1,6 @@
 package com.alle.api.global.security.filter;
 
+import com.alle.api.global.exception.ExceptionCode;
 import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class JwtAuthenticationProcessingFilter
         extends OncePerRequestFilter {
 
-    private final JwtService jwtSer;
+    private final JwtService jwtService;
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -27,12 +28,12 @@ public class JwtAuthenticationProcessingFilter
         String token = resolveToken(request);
 
         try {
-            if (token != null && jwtSer.validateToken(token)) {
-                Authentication authentication = jwtSer.getAuthenticationFromAccessToken(token);
+            if (token != null && jwtService.validateToken(token)) {
+                Authentication authentication = jwtService.getAuthenticationFromAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (JwtException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            throw new JwtException(ExceptionCode.NOT_FOUND_TOKEN);
         }
         filterChain.doFilter(request, response);
     }

@@ -42,7 +42,7 @@ public class MemberService {
 //TODO:: 유효성 검증 메서드 만들기
 //        validateExistingMember(request.getEmail());
 //        validateExistingNickname(request.getNickname());
-//        validatePassword(request.getPassword(), request.getPasswordConfirm());
+        validatePassword(request.getPassword(), request.getPasswordConfirm());
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 //TODO:: 저장소 만들고 사진 보내기

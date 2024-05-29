@@ -45,7 +45,6 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(option -> option.disable()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(request -> request
-                        .requestMatchers("/api/v1/member/me").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(login -> login.userInfoEndpoint(config -> config.userService(customOAuth2UserService))
