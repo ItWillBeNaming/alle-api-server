@@ -85,7 +85,7 @@ class JwtServiceTest {
                 .compact();
 
         JwtException exception = assertThrows(JwtException.class, () -> jwtService.validateToken(token));
-        assertEquals("Token expired", exception.getMessage());
+        assertEquals("Expired token.", exception.getMessage());
     }
 
     @Test
