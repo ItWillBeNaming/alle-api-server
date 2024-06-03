@@ -3,8 +3,8 @@ package com.alle.api.global.email.service;
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.domain.member.service.MemberService;
-import com.alle.api.global.exception.custom.EmailException;
 import com.alle.api.global.exception.ExceptionCode;
+import com.alle.api.global.exception.custom.EmailException;
 import com.alle.api.global.redis.service.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 @EnableAsync
 @RequiredArgsConstructor
 @Transactional
+//TODO:: 이메일 전송 및 확인 검증 로직 필요
 public class EmailService {
 
     private final JavaMailSender javaMailSender;

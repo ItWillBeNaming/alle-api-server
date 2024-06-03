@@ -1,8 +1,6 @@
 package com.alle.api.domain.board.domain;
 
-import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractModifier;
-import com.alle.api.global.domain.AbstractTimeStamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.FetchType.*;
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter

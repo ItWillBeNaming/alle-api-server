@@ -1,8 +1,12 @@
 package com.alle.api.domain.board.domain;
+
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractModifier;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 

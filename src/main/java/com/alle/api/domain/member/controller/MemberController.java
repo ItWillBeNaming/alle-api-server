@@ -1,16 +1,12 @@
 package com.alle.api.domain.member.controller;
 
-import com.alle.api.global.email.dto.request.AuthCodeVerificationRequest;
-import com.alle.api.global.email.dto.request.EmailRequest;
-import com.alle.api.global.email.service.EmailService;
-import com.alle.api.domain.member.dto.request.UpdatePasswordRequest;
-import com.alle.api.domain.member.dto.request.DeleteRequest;
-import com.alle.api.domain.member.dto.request.SignInReq;
-import com.alle.api.domain.member.dto.request.SignUpReq;
-import com.alle.api.domain.member.dto.request.UpdateReq;
+import com.alle.api.domain.member.dto.request.*;
 import com.alle.api.domain.member.dto.response.FindMemberResp;
 import com.alle.api.domain.member.service.MemberService;
 import com.alle.api.global.domain.Response;
+import com.alle.api.global.email.dto.request.AuthCodeVerificationRequest;
+import com.alle.api.global.email.dto.request.EmailRequest;
+import com.alle.api.global.email.service.EmailService;
 import com.alle.api.global.security.CookieUtils;
 import com.alle.api.global.security.CustomUserDetail;
 import com.alle.api.global.security.JwtToken;
@@ -142,13 +138,15 @@ public class MemberController {
 
     }
 
+
+    //TODO::message 영어로 바꿔놓기
     @GetMapping("/reissueToken")
-    public Response<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public Response<String> reissue(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtils.extractRefreshToken(request);
         JwtToken newToken = memberService.reissueToken(refreshToken);
-        response.addHeader("Authorization", newToken.getAccessToken());
+//        response.addHeader("Authorization", newToken.getAccessToken()); //header에 담을 필요 없이 body로 보내야함
         CookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
-        return Response.success(HttpStatus.OK, "토큰 재발급 성공");
+        return Response.success(HttpStatus.OK, "토큰 재발급 성공",newToken.getAccessToken());
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경입니다.")

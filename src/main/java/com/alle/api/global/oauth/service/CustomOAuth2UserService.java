@@ -1,12 +1,10 @@
 package com.alle.api.global.oauth.service;
 
 import com.alle.api.domain.member.constant.RoleType;
-import com.alle.api.domain.member.constant.SocialType;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.domain.member.repository.MemberRepository;
 import com.alle.api.domain.token.entity.SocialAccessToken;
 import com.alle.api.domain.token.repository.SocialAccessTokenRepository;
-import com.alle.api.global.oauth.domain.CustomOAuth2User;
 import com.alle.api.global.oauth.dto.OAuthAttributes;
 import com.alle.api.global.security.CustomUserDetail;
 import lombok.RequiredArgsConstructor;

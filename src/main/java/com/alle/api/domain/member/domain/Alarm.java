@@ -1,12 +1,13 @@
 package com.alle.api.domain.member.domain;
 
+import com.alle.api.global.domain.AbstractTimeStamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static jakarta.persistence.FetchType.*;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -14,7 +15,7 @@ import static jakarta.persistence.FetchType.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "alarm")
-public class Alarm {
+public class Alarm extends AbstractTimeStamp {
 
     @Id
     @GeneratedValue
