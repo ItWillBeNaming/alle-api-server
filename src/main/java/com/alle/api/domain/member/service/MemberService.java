@@ -39,9 +39,8 @@ public class MemberService {
 
 
     public void join(SignUpReq request) {
-//TODO:: 유효성 검증 메서드 만들기
-//        validateExistingMember(request.getEmail());
-//        validateExistingNickname(request.getNickname());
+        validateExistingMember(request.getEmail());
+        validateExistingNickname(request.getNickname());
         validatePassword(request.getPassword(), request.getPasswordConfirm());
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -156,4 +155,18 @@ public class MemberService {
         return memberRepository.findByLoginIdAndRole(email, role)
                 .orElseThrow(() -> new MemberException(ExceptionCode.NOT_FOUND_MEMBER));
     }
+
+    private void validateExistingMember(String email) {
+        if (memberRepository.findByLoginIdAndRole(email, RoleType.MEMBER_NORMAL).isPresent()) {
+            throw new MemberException(ExceptionCode.MEMBER_ALREADY_EXISTS);
+        }
+
+    }
+
+    private void validateExistingNickname(String nickname) {
+        if (memberRepository.findByNickname(nickname).isPresent()) {
+            throw new MemberException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
 }
