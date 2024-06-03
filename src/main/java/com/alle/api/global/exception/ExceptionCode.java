@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.CONFLICT;
 
 @Getter
 @AllArgsConstructor
@@ -32,7 +31,9 @@ public enum ExceptionCode {
     INVALID_TOKEN(UNAUTHORIZED, "Invalid token.", 401),
     UNSUPPORTED_TOKEN(UNAUTHORIZED, "Unsupported token format.", 401),
     NOT_FOUND_TOKEN(UNAUTHORIZED, "Token not found.", 401),
-    NOT_FOUND_REFRESH_TOKEN(UNAUTHORIZED, "Refresh token for the user not found.", 401);
+    NOT_FOUND_REFRESH_TOKEN(UNAUTHORIZED, "Refresh token for the user not found.", 401),
+    MEMBER_ALREADY_EXISTS(CONFLICT,"Member Already Exists" , 403 ),
+    NICKNAME_ALREADY_EXISTS(CONFLICT, "Nickname already exists" , 403 );
 
 
 
