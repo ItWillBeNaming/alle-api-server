@@ -29,10 +29,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
+//TODO:: 탈퇴하지 않은 회원인지 join,login에서 로직 추가하기
 public class MemberController {
 
     private final MemberService memberService;
     private final EmailService emailService;
+    private final CookieUtils cookieUtils;
 
     @Operation(summary = "회원 가입", description = "일반 이메일 회원 가입입니다.",
             parameters = {
@@ -65,7 +67,7 @@ public class MemberController {
     public Response<Void> login(@RequestBody SignInReq request, HttpServletResponse response) {
         JwtToken jwtToken = memberService.login(request);
         response.addHeader("Authorization", jwtToken.getAccessToken());
-        CookieUtils.addCookie(response, "refreshToken", jwtToken.getRefreshToken(), 24 * 60 * 60 * 7);
+        cookieUtils.addCookie(response, "refreshToken", jwtToken.getRefreshToken(), 24 * 60 * 60 * 7);
         return Response.success(HttpStatus.OK, "로그인 성공");
     }
 
@@ -104,7 +106,7 @@ public class MemberController {
     })
     @PostMapping("/logout")
     public Response<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtils.extractRefreshToken(request);
+        String refreshToken = cookieUtils.extractRefreshToken(request);
         memberService.logout(refreshToken, response);
         return Response.success(HttpStatus.OK, "로그아웃 성공");
 
@@ -142,10 +144,9 @@ public class MemberController {
     //TODO::message 영어로 바꿔놓기
     @GetMapping("/reissueToken")
     public Response<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtils.extractRefreshToken(request);
+        String refreshToken = cookieUtils.extractRefreshToken(request);
         JwtToken newToken = memberService.reissueToken(refreshToken);
-//        response.addHeader("Authorization", newToken.getAccessToken()); //header에 담을 필요 없이 body로 보내야함
-        CookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
+        cookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
         return Response.success(HttpStatus.OK, "토큰 재발급 성공",newToken.getAccessToken());
     }
 
