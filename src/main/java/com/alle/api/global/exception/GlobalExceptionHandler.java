@@ -1,15 +1,13 @@
 package com.alle.api.global.exception;
 
+import com.alle.api.global.exception.custom.EmailException;
+import com.alle.api.global.exception.custom.JwtException;
+import com.alle.api.global.exception.custom.MemberException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.security.SignatureException;
-
-import static com.alle.api.global.exception.ExceptionCode.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,19 +34,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
     }
 
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<ExceptionResponse> handleSignatureException() {
-        defaultLogger.warn(INVALID_TOKEN.getMessage());
-        ExceptionResponse exceptionResponse = ExceptionResponse.fromException(INVALID_TOKEN);
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ExceptionResponse> handleJwtException(JwtException ex) {
+        defaultLogger.error(ex.getMessage(), ex);
+        exceptionLogger.error(ex.getMessage(), ex);
 
+        ExceptionResponse exceptionResponse = ExceptionResponse.fromError(ex);
         return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
     }
 
-    @ExceptionHandler(AuthenticationServiceException.class)
-    public ResponseEntity<ExceptionResponse> handleAuthenticationServiceExcpetion(AuthenticationServiceException e){
-        defaultLogger.warn(e.getMessage());
-        ExceptionResponse exceptionResponse = ExceptionResponse.fromException(INVALID_TOKEN);
+    @ExceptionHandler(MemberException.class)
+    public ResponseEntity<ExceptionResponse> handleMemberException(MemberException ex) {
+        defaultLogger.error(ex.getMessage(), ex);
+        exceptionLogger.error(ex.getMessage(), ex);
+        ExceptionResponse exceptionResponse = ExceptionResponse.fromError(ex);
+        return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
+    }
 
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<ExceptionResponse> handleEmailException(EmailException ex) {
+        defaultLogger.error(ex.getMessage(), ex);
+        exceptionLogger.error(ex.getMessage(), ex);
+        ExceptionResponse exceptionResponse = ExceptionResponse.fromError(ex);
         return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
     }
 

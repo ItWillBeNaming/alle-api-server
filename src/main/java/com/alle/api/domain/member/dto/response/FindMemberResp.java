@@ -1,6 +1,5 @@
 package com.alle.api.domain.member.dto.response;
 
-import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;

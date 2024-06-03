@@ -1,8 +1,5 @@
 package com.alle.api.global.oauth.dto;
 
-import com.alle.api.domain.member.constant.RoleType;
-import com.alle.api.domain.member.constant.SocialType;
-import com.alle.api.domain.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 @ToString

@@ -2,8 +2,6 @@ package com.alle.api.global.exception;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static com.alle.api.global.exception.ExceptionCode.NOT_HANDLED_EXCEPTION;
