@@ -18,7 +18,7 @@ public class JwtUtils {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void handleLogout(String refreshToken, HttpServletResponse response) {
-        if(refreshToken == null || !validateRefreshToken(refreshToken)) {
+        if(refreshToken== null || refreshToken.isEmpty()) {
             throw new MemberException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN_IN_COOKIE);
         }
 
