@@ -1,6 +1,7 @@
 package com.alle.api.domain.board.domain;
 
 import com.alle.api.global.domain.AbstractModifier;
+import com.alle.api.global.domain.AbstractTimeStamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "board")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Board extends AbstractModifier {
+public class Board extends AbstractTimeStamp {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -30,7 +31,10 @@ public class Board extends AbstractModifier {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name="view_count", nullable = false)
+    @Column(name = "writer", nullable = false)
+    private String writer;
+
+    @Column(name = "view_count", nullable = false)
     private int viewCount;
 
     @Column(name = "like_count", nullable = false)
