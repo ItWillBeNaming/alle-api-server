@@ -1,5 +1,6 @@
 package com.alle.api.domain.member.service;
 
+import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.domain.member.dto.request.*;
@@ -43,6 +44,7 @@ public class MemberService {
         validateExistingNickname(request.getNickname());
         validatePassword(request.getPassword(), request.getPasswordConfirm());
 
+
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 //TODO:: 저장소 만들고 사진 보내기
 //        String uploadFileName = determineProfileImgUrl(request.getProfileImage());
@@ -53,8 +55,11 @@ public class MemberService {
 
     public JwtToken login(SignInReq request) {
         Authentication authentication = getUserAuthentication(request);
+        validateWithdrawMember(request);
         return jwtService.generateToken(authentication);
     }
+
+
 
     public FindMemberResp getMemberDetails(Long memberId) {
         Member member = getMemberById(memberId);
@@ -166,6 +171,15 @@ public class MemberService {
     private void validateExistingNickname(String nickname) {
         if (memberRepository.findByNickname(nickname).isPresent()) {
             throw new MemberException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateWithdrawMember(SignInReq request) {
+        Member member = memberRepository.findByLoginId(request.getLoginId()).orElseThrow( ()->
+                new MemberException(ExceptionCode.NOT_FOUND_MEMBER)
+        );
+        if (member.getStatus().equals(MemberStatus.D)) {
+            throw new MemberException(ExceptionCode.MEMBER_ALREADY_WITHDRAW);
         }
     }
 
