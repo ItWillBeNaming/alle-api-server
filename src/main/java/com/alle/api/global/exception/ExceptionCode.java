@@ -36,7 +36,8 @@ public enum ExceptionCode {
     NOT_FOUND_BOARD(CONFLICT,  "Can't find Board" ,403 ),
     MEMBER_ALREADY_EXISTS(CONFLICT,"Member Already Exists" , 403 ),
     NICKNAME_ALREADY_EXISTS(CONFLICT, "Nickname already exists" , 403 ),
-    NOT_MATCHED_WRITER(CONFLICT,"Not Matched Writer" ,403 );
+    NOT_MATCHED_WRITER(CONFLICT,"Not Matched Writer" ,403 ),
+    INVALID_BOARD(CONFLICT, "INVALID BOARD" ,403 ), MEMBER_ALREADY_WITHDRAW(CONFLICT, "MEMBER ALREADY WITHDRAW",403 );
 
 
     private final HttpStatus httpStatus;
