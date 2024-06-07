@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
-//TODO:: 탈퇴하지 않은 회원인지 join,login에서 로직 추가하기
 public class MemberController {
 
     private final MemberService memberService;
@@ -51,10 +50,11 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "회원 가입 실패 (필수 입력값을 입력하지 않은 경우, 비밀번호와 비밀번호 확인이 일치하지 않는 경우)")
     })
+
     @PostMapping("/join")
     public Response<Void> join(@RequestBody @Valid SignUpReq request) {
         memberService.join(request);
-        return Response.success(HttpStatus.CREATED, "회원 가입 성공");
+        return Response.success(HttpStatus.CREATED, "Sign-up successful");
     }
 
     @Operation(summary = "로그인", description = "일반 로그인")
@@ -68,14 +68,14 @@ public class MemberController {
         JwtToken jwtToken = memberService.login(request);
         response.addHeader("Authorization", jwtToken.getAccessToken());
         cookieUtils.addCookie(response, "refreshToken", jwtToken.getRefreshToken(), 24 * 60 * 60 * 7);
-        return Response.success(HttpStatus.OK, "로그인 성공");
+        return Response.success(HttpStatus.OK, "Login successful");
     }
 
     @Operation(summary = "회원 정보 조회", description = "인증 토큰을 사용하여 회원 정보를 조회합니다.")
     @GetMapping("/me")
     public Response<FindMemberResp> findMember(@AuthenticationPrincipal CustomUserDetail user) {
         FindMemberResp member = memberService.getMemberDetails(user.getId());
-        return Response.success(HttpStatus.OK, "회원 조회 성공", member);
+        return Response.success(HttpStatus.OK, "Member information retrieved successfully", member);
     }
 
     //TODO:: 사진 수정도 나중에 구현하기
@@ -93,7 +93,7 @@ public class MemberController {
     public Response<Void> updateMember(@RequestBody UpdateReq updateReq) {
         memberService.updateMember(updateReq);
 
-        return Response.success(HttpStatus.OK, "정보 수정 완료");
+        return Response.success(HttpStatus.OK, "Information updated successfully");
 
     }
 
@@ -108,7 +108,7 @@ public class MemberController {
     public Response<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieUtils.extractRefreshToken(request);
         memberService.logout(refreshToken, response);
-        return Response.success(HttpStatus.OK, "로그아웃 성공");
+        return Response.success(HttpStatus.OK, "Logout successful");
 
     }
 
@@ -123,7 +123,7 @@ public class MemberController {
     public Response<Void> deleteMember(@AuthenticationPrincipal CustomUserDetail user,
                                        @RequestBody DeleteRequest request) {
         memberService.deleteMember(user.getId(), request);
-        return Response.success(HttpStatus.OK, "일반 회원 탈퇴 성공");
+        return Response.success(HttpStatus.OK, "Member successfully deleted");
     }
 
     @Operation(summary = "소셜 회원 탈퇴", description = "소셜 회원은 재로그인을 통해 검증, 재발급 받은 액세스 토큰을 통해 서비스 탈퇴")
@@ -136,18 +136,17 @@ public class MemberController {
     public Response<Void> deleteSocialMember(@AuthenticationPrincipal CustomUserDetail user) {
         memberService.deleteSocialMember(user.getId());
 
-        return Response.success(HttpStatus.OK, "소셜 회원 탈퇴 성공");
+        return Response.success(HttpStatus.OK, "Social member successfully deleted");
 
     }
 
 
-    //TODO::message 영어로 바꿔놓기
     @GetMapping("/reissueToken")
     public Response<String> reissue(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieUtils.extractRefreshToken(request);
         JwtToken newToken = memberService.reissueToken(refreshToken);
         cookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
-        return Response.success(HttpStatus.OK, "토큰 재발급 성공",newToken.getAccessToken());
+        return Response.success(HttpStatus.OK, "Token reissued successfully",newToken.getAccessToken());
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경입니다.")
@@ -160,7 +159,7 @@ public class MemberController {
     public Response<Void> updatePassword(@AuthenticationPrincipal CustomUserDetail user,
                                          @RequestBody @Valid UpdatePasswordRequest request) {
         memberService.updatePassword(user.getId(), request);
-        return Response.success(HttpStatus.OK, "비밀번호 변경 성공");
+        return Response.success(HttpStatus.OK, "Password changed successfully");
     }
 
 
@@ -175,7 +174,7 @@ public class MemberController {
         // 회원 인증 후 인증 코드 전송
         emailService.validateMember(request.getEmail());
         emailService.sendAuthCode(request.getEmail());
-        return Response.success(HttpStatus.OK, "이메일 인증 코드 전송 완료");
+        return Response.success(HttpStatus.OK, "Verification code sent successfully");
     }
 
 
@@ -184,12 +183,12 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "이메일 인증에 실패하였습니다.",
-            content = {@Content(schema = @Schema(implementation = Response.class))})
+                    content = {@Content(schema = @Schema(implementation = Response.class))})
     })
     @PostMapping("/verify-authCode")
     public Response<Void> verifyAuthCode(@RequestBody @Valid AuthCodeVerificationRequest request) {
         emailService.validateAuthCode(request.getEmail(), request.getAuthCode());
-        return Response.success(HttpStatus.OK, "이메일 인증 성공");
+        return Response.success(HttpStatus.OK, "Email verified successfully");
     }
 
 
@@ -201,6 +200,6 @@ public class MemberController {
     @PostMapping("/send-temporaryPassword")
     public Response<Void> sendEmailTempPassword(@RequestBody @Valid EmailRequest request) {
         emailService.sendTemporaryPassword(request.getEmail());
-        return Response.success(HttpStatus.OK, "임시 비밀번호 전송 완료");
+        return Response.success(HttpStatus.OK, "Temporary password sent successfully");
     }
 }
