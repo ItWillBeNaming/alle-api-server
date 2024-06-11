@@ -35,4 +35,13 @@ public abstract class AbstractModifier {
 
     @Column(nullable = false)
     private Boolean isDeleted;
+
+
+    public void updateStatus(Member member) {
+        createdMember = member;
+        lastModifiedMember = member;
+        createdDate = LocalDateTime.now();
+        lastModifiedDate = LocalDateTime.now();
+        isDeleted = false;
+    }
 }

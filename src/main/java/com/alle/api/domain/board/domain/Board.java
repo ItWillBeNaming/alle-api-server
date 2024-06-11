@@ -1,6 +1,5 @@
 package com.alle.api.domain.board.domain;
 
-import com.alle.api.global.domain.AbstractModifier;
 import com.alle.api.global.domain.AbstractTimeStamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,16 +39,23 @@ public class Board extends AbstractTimeStamp {
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
+
     @Column(name = "comment_count", nullable = false)
     private int commentCount;
 
-    @OneToMany(mappedBy = "board")
+    /**
+     * Default: 초기화 메서드
+     */
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<BoardComment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Favorite> favorites = new ArrayList<>();
 
 
@@ -57,6 +63,40 @@ public class Board extends AbstractTimeStamp {
         this.title = title;
         this.content = content;
 
+    }
+
+
+    public void increaseViewCount() {
+        this.viewCount +=1;
+    }
+
+    // 연관 관계 편의 메서드
+    public void addComment(BoardComment comment) {
+        comments.add(comment);
+        comment.setBoard(this);
+    }
+
+    public void removeComment(BoardComment comment) {
+        comments.remove(comment);
+        comment.setBoard(null);
+    }
+
+    public void addLike(Like like) {
+        likes.add(like);
+        like.setBoard(this);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+        like.setBoard(null);
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount += 1;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount -= 1;
     }
 
 

@@ -3,7 +3,6 @@ package com.alle.api.global.security;
 import com.alle.api.global.exception.ExceptionCode;
 import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.service.JwtService;
-import com.alle.api.global.security.util.JwtUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -29,4 +29,7 @@ public class Like extends AbstractModifier {
     private Member member;
 
 
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }

@@ -30,7 +30,7 @@ public class BoardComment extends AbstractModifier {
     @JoinColumn(name = "parent_id")
     private BoardComment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardComment> childComments;
 
     @ManyToOne
@@ -41,13 +41,30 @@ public class BoardComment extends AbstractModifier {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-    // 댓글 또는 대댓글 업데이트 메서드
-    public void updateComment(String content) {
-        if (this.parentComment != null) {
-            this.parentComment.content = content;
-        } else {
-            this.childComments.get(0).content = content;
-        }
+
+
+    // 연관 관계 편의 메서드
+    public void setChildComment(BoardComment child) {
+        childComments.add(child);
+        child.setParentComment(this);
+    }
+
+    public void removeChildComment(BoardComment child) {
+        childComments.remove(child);
+        child.setParentComment(null);
+    }
+
+    public void setParentComment(BoardComment parentComment) {
+        this.parentComment = parentComment;
+    }
+
+    //TODO:: 부모댓글이 삭제된다면 하위 댓글도 다 같이 삭제??
+    public void removeParentComment(BoardComment parentComment) {
+        this.parentComment = null;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
 
