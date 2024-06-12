@@ -1,38 +1,28 @@
 package com.alle.api.global.security.util;
 
 import com.alle.api.domain.token.repository.RefreshTokenRepository;
-import com.alle.api.global.exception.ExceptionCode;
 import com.alle.api.global.exception.custom.JwtException;
-import com.alle.api.global.exception.custom.MemberException;
+import com.alle.api.global.security.CookieUtils;
 import com.alle.api.global.security.service.JwtService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtUtils {
 
-    private final JwtService   jwtService;
+    private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CookieUtils cookieUtils;
 
-    public void handleLogout(String refreshToken, HttpServletResponse response) {
-        if(refreshToken== null || refreshToken.isEmpty()) {
-            throw new MemberException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN_IN_COOKIE);
-        }
+    public void handleExpiredRefreshToken(String refreshToken, HttpServletResponse response) {
 
-        refreshTokenRepository.deleteByRefreshToken(refreshToken);
-        deleteRefreshTokenInCookie(response);
-    }
+        cookieUtils.deleteCookie(response, "refreshToken");
+        jwtService.deleteRefreshTokenDB(refreshToken);
 
-    private void deleteRefreshTokenInCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("refreshToken", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
     }
 
     private boolean validateRefreshToken(String refreshToken) {

@@ -52,8 +52,6 @@ public class JwtService {
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
-
-
     public JwtToken generateToken(Authentication authentication) {
         return JwtToken.builder()
                 .grantType("Bearer")
@@ -64,6 +62,9 @@ public class JwtService {
 
     // 리프레시 토큰을 이용해 액세스 토큰을 재발급
     public JwtToken reissueTokenByRefreshToken(String oldRefreshToken) {
+
+        validateToken(oldRefreshToken);
+
         RefreshToken oldRefreshTokenDB = refreshTokenRepository.findByRefreshToken(oldRefreshToken)
                 .orElseThrow(() -> new JwtException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN));
         Authentication authentication = getAuthenticationFromMemberId(oldRefreshTokenDB.getMemberId());
@@ -106,18 +107,9 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
-            throw new JwtException(ExceptionCode.INVALID_TOKEN);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-            throw new JwtException(ExceptionCode.TOKEN_EXPIRED);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-            throw new JwtException(ExceptionCode.UNSUPPORTED_TOKEN);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
-            throw new JwtException(ExceptionCode.NOT_FOUND_TOKEN);
+        } catch (Exception e) {
+            deleteRefreshTokenDB(token);
+            throw handlingJwtException(e);
         }
     }
 
@@ -194,6 +186,30 @@ public class JwtService {
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        }
+    }
+
+    public void deleteRefreshTokenDB(String refreshToken) {
+
+        try {
+            refreshTokenRepository.deleteByRefreshToken(refreshToken);
+        } catch (Exception ignored) {
+            String tokenInfo = refreshToken == null ? "null" : refreshToken;
+            log.info("Failed to delete refreshToken, Token: {}", tokenInfo);
+        }
+    }
+
+    private JwtException handlingJwtException(Exception e) {
+        if (e instanceof SecurityException || e instanceof MalformedJwtException) {
+            return new JwtException(ExceptionCode.INVALID_TOKEN);
+        } else if (e instanceof ExpiredJwtException) {
+            return new JwtException(ExceptionCode.TOKEN_EXPIRED);
+        } else if (e instanceof UnsupportedJwtException) {
+            return new JwtException(ExceptionCode.UNSUPPORTED_TOKEN);
+        } else if (e instanceof IllegalArgumentException) {
+            return new JwtException(ExceptionCode.NOT_FOUND_TOKEN);
+        } else {
+            return new JwtException();
         }
     }
 

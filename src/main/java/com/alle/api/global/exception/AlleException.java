@@ -11,6 +11,11 @@ public class AlleException extends RuntimeException {
         this.exceptionCode = exceptionCode;
     }
 
+    public AlleException() {
+        super(ExceptionCode.INVALID_PARAMETER.getMessage());
+        this.exceptionCode = ExceptionCode.INVALID_PARAMETER;
+    }
+
     public ExceptionCode getExceptionCode() {
         return this.exceptionCode;
     }

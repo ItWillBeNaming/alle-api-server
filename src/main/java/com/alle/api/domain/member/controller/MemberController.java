@@ -106,8 +106,11 @@ public class MemberController {
     })
     @PostMapping("/logout")
     public Response<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieUtils.extractRefreshToken(request);
+
+        String refreshToken = cookieUtils.getRefreshToken(request);
+
         memberService.logout(refreshToken, response);
+
         return Response.success(HttpStatus.OK, "Logout successful");
 
     }
@@ -143,10 +146,11 @@ public class MemberController {
 
     @GetMapping("/reissueToken")
     public Response<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieUtils.extractRefreshToken(request);
+
+        String refreshToken = cookieUtils.getRefreshToken(request);
         JwtToken newToken = memberService.reissueToken(refreshToken);
         cookieUtils.addCookie(response, "refreshToken", newToken.getRefreshToken(), 24 * 60 * 60 * 7);
-        return Response.success(HttpStatus.OK, "Token reissued successfully",newToken.getAccessToken());
+        return Response.success(HttpStatus.OK, "Token reissued successfully", newToken.getAccessToken());
     }
 
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경입니다.")
