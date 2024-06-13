@@ -1,5 +1,8 @@
 package com.alle.api.domain.member.domain;
 
+import com.alle.api.domain.board.domain.Board;
+import com.alle.api.domain.board.domain.BoardComment;
+import com.alle.api.domain.boardLike.domain.BoardLike;
 import com.alle.api.domain.member.constant.Gender;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
@@ -10,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -77,7 +82,21 @@ public class Member {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<Board> board;
+
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<BoardComment> boardComments;
+
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<BoardLike> boardLikes;
+
+
     public static Member of(String email, String nickname, String profileImg, RoleType role) {
+
         return Member.builder()
                 .loginId(email)
                 .nickname(nickname)
@@ -142,4 +161,5 @@ public class Member {
     public void updatePassword(String password) {
         this.password= password;
     }
+
 }
