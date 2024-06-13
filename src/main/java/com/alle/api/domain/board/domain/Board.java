@@ -1,11 +1,15 @@
 package com.alle.api.domain.board.domain;
 
+import com.alle.api.domain.boardLike.domain.BoardLike;
+import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractTimeStamp;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +50,22 @@ public class Board extends AbstractTimeStamp {
     /**
      * Default: 초기화 메서드
      */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    @JsonIgnore
+    private Member member;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @JsonIgnore
     private List<BoardComment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Like> likes = new ArrayList<>();
+    @JsonIgnore
+
+    private List<BoardLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @JsonIgnore
     private List<Favorite> favorites = new ArrayList<>();
 
 
@@ -81,12 +91,12 @@ public class Board extends AbstractTimeStamp {
         comment.setBoard(null);
     }
 
-    public void addLike(Like like) {
+    public void addLike(BoardLike like) {
         likes.add(like);
         like.setBoard(this);
     }
 
-    public void removeLike(Like like) {
+    public void removeLike(BoardLike like) {
         likes.remove(like);
         like.setBoard(null);
     }

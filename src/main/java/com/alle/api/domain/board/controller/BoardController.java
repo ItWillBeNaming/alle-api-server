@@ -5,27 +5,31 @@ import com.alle.api.domain.board.dto.request.BoardChildCommentReq;
 import com.alle.api.domain.board.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.board.dto.request.BoardUpdateReq;
 import com.alle.api.domain.board.dto.request.BoardWriteReq;
-import com.alle.api.domain.board.service.BoardService;
+import com.alle.api.domain.board.dto.response.BoardResponse;
+import com.alle.api.domain.board.service.upperClass.BoardService;
 import com.alle.api.global.domain.Response;
 import com.alle.api.global.security.CustomUserDetail;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
 @RequestMapping("/api/v1/board")
-public class BoardController{
+public class BoardController {
 
     private final BoardService boardService;
 
@@ -38,9 +42,7 @@ public class BoardController{
     @PostMapping("/write")
     public Response<Void> write(
             @AuthenticationPrincipal CustomUserDetail userDetail,
-             @RequestBody BoardWriteReq boardWriteReq) {
-
-
+            @RequestBody BoardWriteReq boardWriteReq) {
 
         boardService.write(userDetail, boardWriteReq);
         return Response.success(HttpStatus.OK, "write success");
@@ -52,7 +54,7 @@ public class BoardController{
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "수정 실패")
     })
-    @PostMapping("/update")
+    @PutMapping("/update")
     public Response<Void> update(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestBody BoardUpdateReq boardUpdateReq) {
@@ -82,10 +84,9 @@ public class BoardController{
             @ApiResponse(responseCode = "400", description = "조회 실패")
     })
     @GetMapping("/find/{id}")
-    public Response<Board> findOne(
+    public Response<BoardResponse> findOne(
             @PathVariable("id") Long id) {
-        Board findBoard = boardService.findOne(id);
-        findBoard.increaseViewCount();
+        BoardResponse findBoard = boardService.findOne(id);
         return Response.success(HttpStatus.OK, "find success", findBoard);
     }
 
@@ -96,36 +97,61 @@ public class BoardController{
             @ApiResponse(responseCode = "400", description = "조회 실패")
     })
 
-    //TODO:: 페이징 필요
     @GetMapping("/find")
-    public Response<List<Board>> findAll() {
-        List<Board> BoardList = boardService.findAll();
-        return Response.success(HttpStatus.OK, "find All Success", BoardList);
+    public Response<Page<BoardResponse>> findAll(
+            @Parameter(description = "페이지 시작 번호(0부터 시작)")
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @Parameter(description = "페이지 사이즈(10부터 시작)")
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BoardResponse> boardList = boardService.findAll(pageable);
+        return Response.success(HttpStatus.OK, "find All Success", boardList);
     }
 
-    @PostMapping("/{id}/comments")
-    public Response<Void> comment(
+    @PostMapping("/comments/{id}")
+    public Response<Void> addParentComment(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestBody BoardParentCommentReq boardCommentReq
-                                  ) {
+    ) {
         boardService.addParentComment(id, userDetail, boardCommentReq);
 
 
-        return  Response.success(HttpStatus.OK, "Parent comment success");
+        return Response.success(HttpStatus.OK, "Parent comment success");
 
     }
 
-    @PostMapping("{parentId}/reply")
-    public Response<Void> comment(
+    @PostMapping("/comments/reply/{parentId}")
+    public Response<Void> addChildComment(
             @PathVariable("parentId") Long parentId,
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestBody BoardChildCommentReq boardChildCommentReq
     ) {
-        boardService.addChildComment(parentId, userDetail,boardChildCommentReq);
-        return Response.success(HttpStatus.OK,"Child comment success");
+        boardService.addChildComment(parentId, userDetail, boardChildCommentReq);
+        return Response.success(HttpStatus.OK, "Child comment success");
     }
 
+    @Operation(summary = "게시글 좋아요 증가 또는 감소", description = "게시글의 좋아요를 증가하거나 감소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "좋아요 성공", content = @Content),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
+    })
+    @GetMapping("/like/{id}")
+    public Response<Void> increaseOrDecreaseLike(
+            @Parameter(description = "게시글 ID", required = true)
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetail userDetail
+    ) {
+        long startTime = System.currentTimeMillis();
+        log.info("start Time = {}", startTime);
+        boardService.like(id, userDetail);
+
+        long endTime = System.currentTimeMillis();
+        log.info("during Time = {}", endTime - startTime);
+
+        return Response.success(HttpStatus.OK, "like success");
+    }
 
 
 }
