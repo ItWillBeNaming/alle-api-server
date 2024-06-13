@@ -1,7 +1,5 @@
 package com.alle.api.global.security;
 
-import com.alle.api.global.exception.ExceptionCode;
-import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Component
@@ -28,23 +28,28 @@ public class CookieUtils {
         response.addCookie(cookie);
     }
 
+    public void deleteCookie(HttpServletResponse response, String keyName) {
+        Cookie cookie = new Cookie(keyName, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
+    }
+
     /**
      * jwtService에 있는 refreshToken검증
      *   jwtService.validateToken(refreshToken);
      *
      */
-    public  String extractRefreshToken(HttpServletRequest request) {
+    public String getRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refreshToken")) {
-                    String refreshToken = cookie.getValue();
-                    jwtService.validateToken(refreshToken);
-                    return refreshToken;
-                }
-            }
-        }
-        throw new JwtException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN_IN_COOKIE);
+
+        Optional<String> refreshToken = Arrays.stream(cookies)
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue);
+        return refreshToken.orElse(null);
     }
 
     public static String serialize(Object obj) {

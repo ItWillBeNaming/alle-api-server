@@ -8,4 +8,8 @@ public class JwtException extends AlleException {
     public JwtException(ExceptionCode errorCode) {
         super(errorCode);
     }
+
+    public JwtException() {
+        super(ExceptionCode.INVALID_PARAMETER);
+    }
 }

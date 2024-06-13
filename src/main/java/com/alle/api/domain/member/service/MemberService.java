@@ -97,7 +97,7 @@ public class MemberService {
     }
 
     public void logout(String refreshToken, HttpServletResponse response) {
-        jwtUtils.handleLogout(refreshToken,response);
+        jwtUtils.handleExpiredRefreshToken(refreshToken, response);
     }
 
     public void deleteMember(Long memberId, DeleteRequest request) {
@@ -130,8 +130,7 @@ public class MemberService {
     }
 
     public JwtToken reissueToken(String refreshToken) {
-        JwtToken jwtToken = jwtService.reissueTokenByRefreshToken(refreshToken);
-        return jwtToken;
+        return jwtService.reissueTokenByRefreshToken(refreshToken);
     }
 
     public void updatePassword(Long id, UpdatePasswordRequest request) {
