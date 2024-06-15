@@ -82,3 +82,7 @@ tasks.withType(JavaCompile).configureEach {
 clean.doLast {
 	delete file(generated)
 }
+
+bootJar {
+	archiveFileName = 'alle.jar'
+}
