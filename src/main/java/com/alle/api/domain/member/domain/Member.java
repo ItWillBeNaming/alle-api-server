@@ -58,18 +58,12 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-//    @Column(name = "nick_name",nullable = false, unique = true)
+    @Column(name = "nick_name", unique = true)
     private String nickname;
 
     private LocalDate birthDay;
 
     private String profileImageUrl;
-
-    @Column(name = "map_x")
-    private String mapX;
-    @Column(name = "map_y")
-    private String mapY;
-
 
     private LocalDateTime lastLoginDate;
 
@@ -78,21 +72,6 @@ public class Member {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
-
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
-
-    @OneToMany(mappedBy = "member")
-    @JsonIgnore
-    private List<Board> board;
-
-    @OneToMany(mappedBy = "member")
-    @JsonIgnore
-    private List<BoardComment> boardComments;
-
-    @OneToMany(mappedBy = "member")
-    @JsonIgnore
-    private List<BoardLike> boardLikes;
 
 
     public static Member of(String email, String nickname, String profileImg, RoleType role) {
@@ -105,7 +84,6 @@ public class Member {
                 .role(role)
                 .createdDate(LocalDateTime.now())
                 .lastModifiedDate(LocalDateTime.now())
-                .updateDate(LocalDateTime.now())
                 .status(MemberStatus.Y)
                 .build();
     }

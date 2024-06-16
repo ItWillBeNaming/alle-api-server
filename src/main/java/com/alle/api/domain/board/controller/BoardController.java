@@ -1,6 +1,5 @@
 package com.alle.api.domain.board.controller;
 
-import com.alle.api.domain.board.domain.Board;
 import com.alle.api.domain.board.dto.request.BoardChildCommentReq;
 import com.alle.api.domain.board.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.board.dto.request.BoardUpdateReq;
@@ -143,13 +142,8 @@ public class BoardController {
             @PathVariable("id") Long id,
             @AuthenticationPrincipal CustomUserDetail userDetail
     ) {
-        long startTime = System.currentTimeMillis();
-        log.info("start Time = {}", startTime);
+
         boardService.like(id, userDetail);
-
-        long endTime = System.currentTimeMillis();
-        log.info("during Time = {}", endTime - startTime);
-
         return Response.success(HttpStatus.OK, "like success");
     }
 
