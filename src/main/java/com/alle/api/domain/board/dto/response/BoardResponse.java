@@ -1,25 +1,21 @@
-package com.alle.api.domain.board.dto.request;
+package com.alle.api.domain.board.dto.response;
 
-import com.alle.api.global.domain.AbstractTimeStamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardWriteReq extends AbstractTimeStamp {
+@Builder
+public class BoardResponse {
 
+    private Long boardId;
     private String title;
-
     private String content;
-
-    private String writer;
-
-
-
+    private int viewCount;
+    private int likeCount;
 
 
 }

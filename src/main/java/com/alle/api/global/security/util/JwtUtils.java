@@ -2,7 +2,6 @@ package com.alle.api.global.security.util;
 
 import com.alle.api.domain.token.repository.RefreshTokenRepository;
 import com.alle.api.global.exception.custom.JwtException;
-import com.alle.api.global.security.CookieUtils;
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -8,7 +8,6 @@ import com.alle.api.global.exception.custom.EmailException;
 import com.alle.api.global.redis.service.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.ServletContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,6 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
-    private final ServletContext servletContext;
     private final RedisService redisService;
 
     @Async

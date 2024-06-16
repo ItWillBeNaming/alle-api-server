@@ -25,4 +25,10 @@ public abstract class AbstractTimeStamp {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    public void updateTimeStamp() {
+        this.createdDate = LocalDateTime.now();
+        this.lastModifiedDate = LocalDateTime.now();
+        this.isDeleted = false;
+    }
+
 }
