@@ -40,7 +40,7 @@ public class MemberService {
 
 
     public void join(SignUpReq request) {
-        validateExistingMember(request.getEmail());
+        validateExistingEmail(request.getEmail());
         validateExistingNickname(request.getNickname());
         validatePassword(request.getPassword(), request.getPasswordConfirm());
 
@@ -92,8 +92,11 @@ public class MemberService {
 
     public void updateMember(UpdateReq request) {
         Member findMember = getMemberById(request.getId());
+        validateExistingEmail(request.getEmail());
+        validateExistingNickname(request.getNickname());
 
         findMember.updateInfo(request);
+
     }
 
     public void logout(String refreshToken, HttpServletResponse response) {
@@ -160,7 +163,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(ExceptionCode.NOT_FOUND_MEMBER));
     }
 
-    private void validateExistingMember(String email) {
+    private void validateExistingEmail(String email) {
         if (memberRepository.findByLoginIdAndRole(email, RoleType.MEMBER_NORMAL).isPresent()) {
             throw new MemberException(ExceptionCode.MEMBER_ALREADY_EXISTS);
         }

@@ -16,6 +16,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @Entity
 @Table(name = "board_favorite")
+//TODO:: 게시글 즐겨찾기 사용여부 확인
 public class Favorite extends AbstractTimeStamp {
 
     @Id

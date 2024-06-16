@@ -7,7 +7,7 @@ import com.alle.api.global.domain.Response;
 import com.alle.api.global.email.dto.request.AuthCodeVerificationRequest;
 import com.alle.api.global.email.dto.request.EmailRequest;
 import com.alle.api.global.email.service.EmailService;
-import com.alle.api.global.security.CookieUtils;
+import com.alle.api.global.security.util.CookieUtils;
 import com.alle.api.global.security.CustomUserDetail;
 import com.alle.api.global.security.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -172,7 +172,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "이메일 인증 코드 전송 완료",
                     content = {@Content(schema = @Schema(implementation = Response.class))})
     })
-    @PostMapping("/send-authCode")
+    @PostMapping("/sendAuthCode")
     public Response<Void> sendEmailAuthCode(@RequestBody @Valid EmailRequest request) {
         log.info("request={}",request.getEmail());
         // 회원 인증 후 인증 코드 전송
@@ -189,7 +189,7 @@ public class MemberController {
             @ApiResponse(responseCode = "400", description = "이메일 인증에 실패하였습니다.",
                     content = {@Content(schema = @Schema(implementation = Response.class))})
     })
-    @PostMapping("/verify-authCode")
+    @PostMapping("/verifyAuthCode")
     public Response<Void> verifyAuthCode(@RequestBody @Valid AuthCodeVerificationRequest request) {
         emailService.validateAuthCode(request.getEmail(), request.getAuthCode());
         return Response.success(HttpStatus.OK, "Email verified successfully");
@@ -201,7 +201,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 전송 완료",
                     content = {@Content(schema = @Schema(implementation = Response.class))})
     })
-    @PostMapping("/send-temporaryPassword")
+    @PostMapping("/sendTemporaryPassword")
     public Response<Void> sendEmailTempPassword(@RequestBody @Valid EmailRequest request) {
         emailService.sendTemporaryPassword(request.getEmail());
         return Response.success(HttpStatus.OK, "Temporary password sent successfully");

@@ -1,4 +1,4 @@
-package com.alle.api.global.security;
+package com.alle.api.global.security.util;
 
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.http.Cookie;

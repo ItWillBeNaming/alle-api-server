@@ -1,6 +1,6 @@
 package com.alle.api.global.oauth.handler;
 
-import com.alle.api.global.security.CookieUtils;
+import com.alle.api.global.security.util.CookieUtils;
 import com.alle.api.global.security.JwtToken;
 import com.alle.api.global.security.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
