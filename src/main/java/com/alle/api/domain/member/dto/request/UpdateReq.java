@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateReq {
     private Long id;
-    private String nickname;
+    private String nickName;
     private String email;
 
 }

@@ -51,7 +51,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = Board.builder()
                 .title(boardWriteReq.getTitle())
                 .content(boardWriteReq.getContent())
-                .writer(findMember.getNickname())
+                .writer(findMember.getNickName())
                 .likeCount(0)
                 .build();
 
@@ -202,7 +202,7 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     private boolean validWriter(Board findBoard, Member findMember) {
-        boolean isEqualToNickname = findBoard.getWriter().equals(findMember.getNickname());
+        boolean isEqualToNickname = findBoard.getWriter().equals(findMember.getNickName());
 
         if (!isEqualToNickname) {
             throw new BoardException(ExceptionCode.NOT_MATCHED_WRITER);
@@ -219,7 +219,7 @@ public class BoardServiceImpl implements BoardService {
      */
 
     private Member getMember(CustomUserDetail userDetail) {
-        return memberRepository.findByLoginId(userDetail.getUsername()).orElseThrow(() ->
+        return memberRepository.findByEmail(userDetail.getUsername()).orElseThrow(() ->
                 new MemberException(ExceptionCode.NOT_FOUND_MEMBER)
         );
     }

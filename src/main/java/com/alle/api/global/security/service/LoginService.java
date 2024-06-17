@@ -17,11 +17,11 @@ public class LoginService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        Member user = memberRepository.findByLoginId(loginId)
+        Member user = memberRepository.findByEmail(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다."));
 
         return new CustomUserDetail(
-                user.getLoginId(),
+                user.getEmail(),
                 user.getPassword(),
                 user.getId(),
                 user.getAuthorities()

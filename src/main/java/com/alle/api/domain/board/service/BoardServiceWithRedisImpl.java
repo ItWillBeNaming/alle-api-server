@@ -49,7 +49,7 @@ public class BoardServiceWithRedisImpl implements BoardService {
         Board board = Board.builder()
                 .title(boardWriteReq.getTitle())
                 .content(boardWriteReq.getContent())
-                .writer(findMember.getNickname())
+                .writer(findMember.getNickName())
                 .likeCount(0)
                 .build();
 
@@ -152,7 +152,7 @@ public class BoardServiceWithRedisImpl implements BoardService {
         Board findBoard = getBoard(id);
 
         String redisKey = REDIS_LIKE_KEY_PREFIX+ id;
-        String memberId = findMember.getLoginId().toString();
+        String memberId = "temp";
 
         SetOperations<String, Object> setOps = redisTemplate.opsForSet();
 
@@ -207,7 +207,7 @@ public class BoardServiceWithRedisImpl implements BoardService {
      *
      */
     private boolean validWriter(Board findBoard, Member findMember) {
-        boolean isEqualToNickname = findBoard.getWriter().equals(findMember.getNickname());
+        boolean isEqualToNickname = findBoard.getWriter().equals(findMember.getNickName());
 
         if (!isEqualToNickname) {
             throw new BoardException(ExceptionCode.NOT_MATCHED_WRITER);
@@ -223,7 +223,7 @@ public class BoardServiceWithRedisImpl implements BoardService {
      */
 
     private Member getMember(CustomUserDetail userDetail) {
-        return memberRepository.findByLoginId(userDetail.getUsername()).orElseThrow(() ->
+        return memberRepository.findByEmail(userDetail.getUsername()).orElseThrow(() ->
                 new MemberException(ExceptionCode.NOT_FOUND_MEMBER)
         );
     }
