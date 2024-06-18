@@ -166,5 +166,7 @@ gradle-app.setting
 *.hprof
 
 *.yml
+!application.yml
+!docker-compose.yml
 
 /src/main/generated/
