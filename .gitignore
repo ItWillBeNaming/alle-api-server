@@ -167,5 +167,6 @@ gradle-app.setting
 
 *.yml
 !application.yml
+!docker-compose.yml
 
 /src/main/generated/

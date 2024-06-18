@@ -1,0 +1,24 @@
+version: '3.0'
+
+services:
+  alle-app:
+    image: minxhvk/alle-api-server:latest
+    container_name: alle-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
+  nginx:
+    image: nginx:test
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - alle-app
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
