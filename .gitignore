@@ -166,5 +166,6 @@ gradle-app.setting
 *.hprof
 
 *.yml
+!application.yml
 
 /src/main/generated/
