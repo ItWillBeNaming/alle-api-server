@@ -3,6 +3,7 @@ package com.alle.api.global.security.filter;
 import com.alle.api.global.exception.ExceptionCode;
 import com.alle.api.global.exception.custom.JwtException;
 import com.alle.api.global.security.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter
@@ -26,7 +30,7 @@ public class JwtAuthenticationProcessingFilter
             throws ServletException, IOException {
 
         String path = request.getServletPath();
-        if ("/api/v1/login".equals(path) || "/api/v1/sign-up".equals(path)) {
+        if ("/api/v1/auth/login".equals(path) || "/api/v1/auth/sign-up".equals(path)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,7 +43,7 @@ public class JwtAuthenticationProcessingFilter
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (JwtException e) {
-            throw new JwtException(ExceptionCode.NOT_FOUND_TOKEN);
+            handleAuthenticationException(response, ExceptionCode.NOT_FOUND_TOKEN);
         }
         filterChain.doFilter(request, response);
     }
@@ -50,5 +54,21 @@ public class JwtAuthenticationProcessingFilter
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private void handleAuthenticationException(HttpServletResponse response, ExceptionCode exceptionCode) throws IOException {
+        response.setStatus(exceptionCode.getHttpStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("status", "REJECT");
+        responseBody.put("code", exceptionCode.getCode());
+        responseBody.put("message", exceptionCode.getMessage());
+        responseBody.put("data", null);
+
+        PrintWriter writer = response.getWriter();
+        writer.write(new ObjectMapper().writeValueAsString(responseBody));
+        writer.flush();
+        writer.close();
     }
 }
