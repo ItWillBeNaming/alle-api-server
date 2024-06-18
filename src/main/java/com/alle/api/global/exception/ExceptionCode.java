@@ -21,6 +21,7 @@ public enum ExceptionCode {
     INVALID_PARAMETER(BAD_REQUEST, "BAD Request", 400),
 
     // 401
+    FORBIDDEN_SECURITY(FORBIDDEN, "Forbidden", 403),
     UNAUTHORIZED_LOGIN(UNAUTHORIZED, "Login failed: authentication failed.", 401),
     TOKEN_EXPIRED(UNAUTHORIZED, "Expired token.", 401),
     INVALID_TOKEN(UNAUTHORIZED, "Invalid token.", 401),

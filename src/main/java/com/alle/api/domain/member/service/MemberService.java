@@ -41,7 +41,7 @@ public class MemberService {
 
 
     @Transactional
-    public void join(SignUpReq request) {
+    public void create(SignUpReq request) {
         validateExistingEmail(request.getEmail());
         validateExistingNickname(request.getNickName());
 
