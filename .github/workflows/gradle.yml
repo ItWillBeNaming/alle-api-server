@@ -36,7 +36,7 @@ jobs:
     # Make Application.yml
     - name: make application.yml
       run: |
-        cd ./src/main/resources
+        cd ./src/main/resources/config
 
         touch ./application-dev.yaml
         echo "${{ secrets.APPLICATION_DEV }}" >> ./application-dev.yml
@@ -63,7 +63,8 @@ jobs:
         script: |
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull minxhvk/alle-api-server:latest
-          docker-compose up -d
+          cd /home/Alle/docker-compose/
+          docker compose up -d
           docker image prune -f
 
   dependency-submission:
