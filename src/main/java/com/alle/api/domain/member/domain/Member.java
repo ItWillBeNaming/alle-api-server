@@ -1,30 +1,22 @@
 package com.alle.api.domain.member.domain;
 
-import com.alle.api.domain.board.domain.Board;
-import com.alle.api.domain.board.domain.BoardComment;
-import com.alle.api.domain.boardLike.domain.BoardLike;
 import com.alle.api.domain.member.constant.Gender;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
-import com.alle.api.domain.member.dto.request.SignUpReq;
 import com.alle.api.domain.member.dto.request.UpdateReq;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -38,8 +30,8 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id", nullable = false, unique = true)
-    private String loginId;
+    @Column(nullable = false, unique = true)
+    private String email;
 
     private String password;
 
@@ -50,18 +42,16 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private String email;
-
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    @Column(name = "nick_name", unique = true)
-    private String nickname;
+    @Column(length = 50, unique = true)
+    private String nickName;
 
-    private LocalDate birthDay;
+    private LocalDateTime birthDay;
 
     private String profileImageUrl;
 
@@ -72,54 +62,6 @@ public class Member {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
-
-
-    public static Member of(String email, String nickname, String profileImg, RoleType role) {
-
-        return Member.builder()
-                .loginId(email)
-                .nickname(nickname)
-                .password("") // 소셜 회원은 비밀번호 X
-                .profileImageUrl(profileImg)
-                .role(role)
-                .createdDate(LocalDateTime.now())
-                .lastModifiedDate(LocalDateTime.now())
-                .status(MemberStatus.Y)
-                .build();
-    }
-
-    public static Member of(SignUpReq request, String password) {
-        return Member.builder()
-                .loginId(request.getLoginId())
-                .nickname(request.getNickname())
-                .password(password)
-                .role(RoleType.MEMBER_NORMAL)
-                .status(MemberStatus.Y)
-                .email(request.getEmail())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .birthDay(LocalDate.now())
-                .profileImageUrl(null)
-                .gender(Gender.valueOf(request.getGender()))
-                .build();
-    }
-
-    public static Member of(SignUpReq request, String password, String profileImg) {
-        return Member.builder()
-                .email(request.getEmail())
-                .nickname(request.getNickname())
-                .password(password)
-                .profileImageUrl(profileImg)
-                .role(RoleType.MEMBER_NORMAL)
-                .status(MemberStatus.Y)
-                .email(request.getEmail())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .birthDay(LocalDate.now())
-                .profileImageUrl(null)
-                .gender(Gender.valueOf(request.getGender()))
-                .build();
-    }
 
     public void updateProfile(String name, String picture) {
         this.profileImageUrl = picture;
@@ -132,7 +74,7 @@ public class Member {
     }
 
     public void updateInfo(UpdateReq request) {
-        this.nickname = request.getNickname();
+        this.nickName = request.getNickName();
         this.email = request.getEmail();
     }
 

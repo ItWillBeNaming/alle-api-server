@@ -2,6 +2,7 @@ package com.alle.api.global.oauth.service;
 
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
+import com.alle.api.domain.member.dto.MemberMapper;
 import com.alle.api.domain.member.repository.MemberRepository;
 import com.alle.api.domain.token.entity.SocialAccessToken;
 import com.alle.api.domain.token.repository.SocialAccessTokenRepository;
@@ -51,7 +52,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String name = (String) memberAttribute.get("name");
         String picture = (String) memberAttribute.get("picture");
 
-        Member member = memberRepository.findByLoginIdAndRole(email, memberRole)
+        Member member = memberRepository.findByEmail(email)
                 .map(existingMember -> {
                     existingMember.updateProfile(name, picture);
 
@@ -63,7 +64,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     return existingMember;
 
                 }).orElseGet(() -> {
-                    Member newMember = memberRepository.save(Member.of(email, name, picture, memberRole));
+                    Member newMember = memberRepository.save(MemberMapper.toEntity(email, name, picture, memberRole));
                     socialAccessTokenRepository.save(SocialAccessToken.of(socialAccessToken, newMember)); // 새로운 Member에 대한 SocialAccessToken 저장
                     return newMember;
                 });

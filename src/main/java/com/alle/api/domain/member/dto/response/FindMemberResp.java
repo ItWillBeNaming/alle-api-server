@@ -23,7 +23,7 @@ public class FindMemberResp {
         return FindMemberResp.builder()
                 .id(member.getId())
                 .email(member.getEmail())
-                .nickname(member.getNickname())
+                .nickname(member.getNickName())
                 .profileImg(profileImgUrl)
                 .createdAt(member.getCreatedDate())
                 .build();

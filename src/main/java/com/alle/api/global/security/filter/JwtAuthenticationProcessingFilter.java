@@ -25,6 +25,12 @@ public class JwtAuthenticationProcessingFilter
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getServletPath();
+        if ("/api/v1/login".equals(path) || "/api/v1/sign-up".equals(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveToken(request);
 
         try {

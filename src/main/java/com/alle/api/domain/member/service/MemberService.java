@@ -3,6 +3,7 @@ package com.alle.api.domain.member.service;
 import com.alle.api.domain.member.constant.MemberStatus;
 import com.alle.api.domain.member.constant.RoleType;
 import com.alle.api.domain.member.domain.Member;
+import com.alle.api.domain.member.dto.MemberMapper;
 import com.alle.api.domain.member.dto.request.*;
 import com.alle.api.domain.member.dto.response.FindMemberResp;
 import com.alle.api.domain.member.repository.MemberRepository;
@@ -39,17 +40,17 @@ public class MemberService {
     private final OAuth2RevokeService oAuth2RevokeService;
 
 
+    @Transactional
     public void join(SignUpReq request) {
         validateExistingEmail(request.getEmail());
-        validateExistingNickname(request.getNickname());
-        validatePassword(request.getPassword(), request.getPasswordConfirm());
-
+        validateExistingNickname(request.getNickName());
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
+
 //TODO:: 저장소 만들고 사진 보내기
 //        String uploadFileName = determineProfileImgUrl(request.getProfileImage());
 
-        Member member = Member.of(request, encodedPassword);
+        Member member = MemberMapper.toEntity(request, encodedPassword);
         memberRepository.save(member);
     }
 
@@ -82,7 +83,7 @@ public class MemberService {
     private Authentication getUserAuthentication(SignInReq request) {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    request.getLoginId(), request.getPassword());
+                    request.getEmail(), request.getPassword());
             return authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         } catch (AuthenticationException e) {
             throw new MemberException(ExceptionCode.UNAUTHORIZED_LOGIN);
@@ -93,7 +94,7 @@ public class MemberService {
     public void updateMember(UpdateReq request) {
         Member findMember = getMemberById(request.getId());
         validateExistingEmail(request.getEmail());
-        validateExistingNickname(request.getNickname());
+        validateExistingNickname(request.getNickName());
 
         findMember.updateInfo(request);
 
@@ -155,32 +156,31 @@ public class MemberService {
     }
 
     public Object getMemberByLoginIdAndRole(String loginId, RoleType roleType) {
-        return memberRepository.findByLoginIdAndRole(loginId,roleType);
+        return memberRepository.findByEmail(loginId);
     }
 
     public Member getMemberByEmailAndRole(String email, RoleType role) {
-        return memberRepository.findByLoginIdAndRole(email, role)
+        return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ExceptionCode.NOT_FOUND_MEMBER));
     }
 
     private void validateExistingEmail(String email) {
-        if (memberRepository.findByLoginIdAndRole(email, RoleType.MEMBER_NORMAL).isPresent()) {
+        memberRepository.findByEmail(email).ifPresent(member -> {
             throw new MemberException(ExceptionCode.MEMBER_ALREADY_EXISTS);
-        }
-
+        });
     }
 
-    private void validateExistingNickname(String nickname) {
-        if (memberRepository.findByNickname(nickname).isPresent()) {
+    private void validateExistingNickname(String nickName) {
+        memberRepository.findByNickName(nickName).ifPresent(member -> {
             throw new MemberException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
-        }
+        });
     }
 
     private void validateWithdrawMember(SignInReq request) {
-        Member member = memberRepository.findByLoginId(request.getLoginId()).orElseThrow( ()->
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow( ()->
                 new MemberException(ExceptionCode.NOT_FOUND_MEMBER)
         );
-        if (member.getStatus().equals(MemberStatus.D)) {
+        if (member.getStatus().equals(MemberStatus.INACTIVE)) {
             throw new MemberException(ExceptionCode.MEMBER_ALREADY_WITHDRAW);
         }
     }

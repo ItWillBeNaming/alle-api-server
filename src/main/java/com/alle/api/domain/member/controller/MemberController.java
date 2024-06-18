@@ -23,11 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/member")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -50,9 +51,8 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "회원 가입 실패 (필수 입력값을 입력하지 않은 경우, 비밀번호와 비밀번호 확인이 일치하지 않는 경우)")
     })
-
-    @PostMapping("/join")
-    public Response<Void> join(@RequestBody @Valid SignUpReq request) {
+    @PostMapping("/sign-up")
+    public Response<Void> join(@Validated @RequestBody  SignUpReq request) {
         memberService.join(request);
         return Response.success(HttpStatus.CREATED, "Sign-up successful");
     }
