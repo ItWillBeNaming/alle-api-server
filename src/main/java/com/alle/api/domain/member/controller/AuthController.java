@@ -22,6 +22,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,6 +61,21 @@ public class AuthController {
     public Response<Void> signUp(@Validated @RequestBody SignUpReq request) {
         memberService.create(request);
         return Response.success(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/api/users/check-email")
+    public void checkEmail(
+            @RequestParam @NotBlank(message = "이메일은 필수 입력 값입니다.")
+            @Email(message = "이메일 형식이 올바르지 않습니다.") String email) {
+        memberService.checkEmail(email);
+    }
+
+    @GetMapping("/api/users/check-nickname")
+    public void checkNickname(
+            @RequestParam @NotBlank(message = "닉네임은 필수 입력 값입니다.")
+            @Size(max = 8, message = "닉네임은 8자 이하로 입력해야 합니다.")
+            @Pattern(regexp = "^[\\p{L}0-9]+$", message = "닉네임에는 특수 문자를 사용할 수 없습니다.") String nickname) {
+        memberService.checkNickname(nickname);
     }
 
     @Operation(summary = "로그인", description = "일반 로그인")

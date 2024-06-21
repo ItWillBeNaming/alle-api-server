@@ -37,10 +37,6 @@ public class SignUpReq {
     @NotBlank(message = "성별은 필수 입력 값입니다.")
     private String gender;
 
-    private RoleType role;
-
-    private MemberStatus memberStatus;
-
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     @Size(max = 8, message = "닉네임은 8자 이하로 입력해야 합니다.")
     @Pattern(regexp = "^[\\p{L}0-9]+$", message = "닉네임에는 특수 문자를 사용할 수 없습니다.")

@@ -1,9 +1,9 @@
 package com.alle.api.domain.board.domain;
 
+import com.alle.api.domain.boardComment.domain.BoardComment;
 import com.alle.api.domain.boardLike.domain.BoardLike;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractTimeStamp;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

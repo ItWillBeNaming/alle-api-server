@@ -1,5 +1,6 @@
-package com.alle.api.domain.board.domain;
+package com.alle.api.domain.boardComment.domain;
 
+import com.alle.api.domain.board.domain.Board;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.global.domain.AbstractModifier;
 import jakarta.persistence.*;
@@ -16,7 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "board_comment")
+@NamedEntityGraph(name = "BoardComment.children",
+        attributeNodes = @NamedAttributeNode("childComments"))
 public class BoardComment extends AbstractModifier {
 
     @Id

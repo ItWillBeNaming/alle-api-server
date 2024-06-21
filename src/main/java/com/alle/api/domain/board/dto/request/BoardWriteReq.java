@@ -10,16 +10,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardWriteReq extends AbstractTimeStamp {
+public class BoardWriteReq {
 
     private String title;
 
     private String content;
-
-    private String writer;
-
-
-
-
-
 }

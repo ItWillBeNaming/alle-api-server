@@ -3,7 +3,6 @@ package com.alle.api.domain.board.repository;
 import com.alle.api.domain.board.dto.response.BoardResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.alle.api.domain.board.domain.QBoard.*;
+import static com.alle.api.domain.board.domain.QBoard.board;
 
 
 @RequiredArgsConstructor
