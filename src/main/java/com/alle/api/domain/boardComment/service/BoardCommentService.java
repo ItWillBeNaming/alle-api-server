@@ -7,7 +7,6 @@ import com.alle.api.domain.boardComment.dto.request.BoardChildCommentReq;
 import com.alle.api.domain.boardComment.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.boardComment.dto.response.BoardCommentResponse;
 import com.alle.api.domain.boardComment.repository.BoardCommentRepository;
-import com.alle.api.domain.boardComment.repository.CustomBoardCommentRepositoryImpl;
 import com.alle.api.domain.member.domain.Member;
 import com.alle.api.domain.member.repository.MemberRepository;
 import com.alle.api.global.exception.ExceptionCode;
@@ -31,7 +30,6 @@ public class BoardCommentService {
 
     private final BoardRepository boardRepository;
     private final BoardCommentRepository boardCommentRepository;
-    private final CustomBoardCommentRepositoryImpl customBoardCommentRepository;
     private final MemberRepository memberRepository;
 
 
