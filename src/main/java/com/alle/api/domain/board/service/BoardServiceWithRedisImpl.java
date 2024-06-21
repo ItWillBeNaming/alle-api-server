@@ -1,16 +1,13 @@
 package com.alle.api.domain.board.service;
 
 import com.alle.api.domain.board.domain.Board;
-import com.alle.api.domain.board.domain.BoardComment;
-import com.alle.api.domain.board.dto.request.BoardChildCommentReq;
-import com.alle.api.domain.board.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.board.dto.request.BoardUpdateReq;
 import com.alle.api.domain.board.dto.request.BoardWriteReq;
 import com.alle.api.domain.board.dto.response.BoardResponse;
-import com.alle.api.domain.board.repository.BoardCommentRepository;
 import com.alle.api.domain.board.repository.BoardRepository;
 import com.alle.api.domain.board.repository.CustomBoardRepository;
 import com.alle.api.domain.board.service.upperClass.BoardService;
+import com.alle.api.domain.boardComment.repository.BoardCommentRepository;
 import com.alle.api.domain.boardLike.domain.BoardLike;
 import com.alle.api.domain.boardLike.repository.BoardLikeRepository;
 import com.alle.api.domain.member.domain.Member;
@@ -73,44 +70,7 @@ public class BoardServiceWithRedisImpl implements BoardService {
         }
     }
 
-    @Override
-    @Transactional
-    public void addParentComment(Long id, CustomUserDetail userDetail, BoardParentCommentReq boardCommentReq) {
-        Member findMember = getMember(userDetail);
-        Board board = getBoard(id);
 
-        BoardComment boardComment = BoardComment.builder()
-                .content(boardCommentReq.getComment())
-                .member(findMember)
-                .board(board)
-                .build();
-
-        boardComment.updateStatus(findMember);
-        boardComment.setParentComment(boardComment);
-
-        board.addComment(boardComment);
-        boardRepository.save(board);
-        boardCommentRepository.save(boardComment);
-    }
-
-    @Override
-    @Transactional
-    public void addChildComment(Long parentId, CustomUserDetail userDetail, BoardChildCommentReq boardChildCommentReq) {
-        Member findMember = getMember(userDetail);
-        BoardComment parentComment = getBoardComment(parentId);
-
-        BoardComment childComment = BoardComment.builder()
-                .content(boardChildCommentReq.getContent())
-                .member(findMember)
-                .board(parentComment.getBoard())
-                .parentComment(parentComment)
-                .build();
-
-        childComment.updateStatus(findMember);
-
-        parentComment.setChildComment(childComment);
-        boardCommentRepository.save(childComment);
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -180,12 +140,6 @@ public class BoardServiceWithRedisImpl implements BoardService {
         boardRepository.save(findBoard);
 
         return findBoard.getLikeCount();
-    }
-
-    private BoardComment getBoardComment(Long parentId) {
-        return boardCommentRepository.findById(parentId).orElseThrow(
-                () -> new BoardException(ExceptionCode.NOT_FOUND_BOARDCOMMENT)
-        );
     }
 
 

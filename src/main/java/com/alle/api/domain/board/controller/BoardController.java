@@ -1,10 +1,9 @@
 package com.alle.api.domain.board.controller;
 
-import com.alle.api.domain.board.dto.request.BoardChildCommentReq;
-import com.alle.api.domain.board.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.board.dto.request.BoardUpdateReq;
 import com.alle.api.domain.board.dto.request.BoardWriteReq;
 import com.alle.api.domain.board.dto.response.BoardResponse;
+import com.alle.api.domain.board.service.BoardServiceImpl;
 import com.alle.api.domain.board.service.upperClass.BoardService;
 import com.alle.api.global.domain.Response;
 import com.alle.api.global.security.CustomUserDetail;
@@ -30,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/board")
 public class BoardController {
 
-    private final BoardService boardService;
+    private final BoardServiceImpl boardService;
 
     @Operation(summary = "게시글 작성", description = "게시글을 작성합니다.")
     @ApiResponses(value = {
@@ -38,7 +37,7 @@ public class BoardController {
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "작성 실패")
     })
-    @PostMapping("/write")
+    @PostMapping
     public Response<Void> write(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestBody BoardWriteReq boardWriteReq) {
@@ -53,7 +52,7 @@ public class BoardController {
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "수정 실패")
     })
-    @PutMapping("/update")
+    @PutMapping
     public Response<Void> update(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestBody BoardUpdateReq boardUpdateReq) {
@@ -82,10 +81,11 @@ public class BoardController {
                     content = {@Content(schema = @Schema(implementation = Response.class))}),
             @ApiResponse(responseCode = "400", description = "조회 실패")
     })
-    @GetMapping("/find/{id}")
+    @GetMapping("/{id}")
     public Response<BoardResponse> findOne(
             @PathVariable("id") Long id) {
         BoardResponse findBoard = boardService.findOne(id);
+
         return Response.success(HttpStatus.OK, "find success", findBoard);
     }
 
@@ -96,7 +96,7 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "조회 실패")
     })
 
-    @GetMapping("/find")
+    @GetMapping
     public Response<Page<BoardResponse>> findAll(
             @Parameter(description = "페이지 시작 번호(0부터 시작)")
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -107,28 +107,7 @@ public class BoardController {
         return Response.success(HttpStatus.OK, "find All Success", boardList);
     }
 
-    @PostMapping("/comments/{id}")
-    public Response<Void> addParentComment(
-            @PathVariable("id") Long id,
-            @AuthenticationPrincipal CustomUserDetail userDetail,
-            @RequestBody BoardParentCommentReq boardCommentReq
-    ) {
-        boardService.addParentComment(id, userDetail, boardCommentReq);
 
-
-        return Response.success(HttpStatus.OK, "Parent comment success");
-
-    }
-
-    @PostMapping("/comments/reply/{parentId}")
-    public Response<Void> addChildComment(
-            @PathVariable("parentId") Long parentId,
-            @AuthenticationPrincipal CustomUserDetail userDetail,
-            @RequestBody BoardChildCommentReq boardChildCommentReq
-    ) {
-        boardService.addChildComment(parentId, userDetail, boardChildCommentReq);
-        return Response.success(HttpStatus.OK, "Child comment success");
-    }
 
     @Operation(summary = "게시글 좋아요 증가 또는 감소", description = "게시글의 좋아요를 증가하거나 감소합니다.")
     @ApiResponses(value = {

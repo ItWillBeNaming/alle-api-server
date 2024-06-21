@@ -28,7 +28,7 @@ public enum ExceptionCode {
     UNSUPPORTED_TOKEN(UNAUTHORIZED, "Unsupported token format.", 401),
     NOT_FOUND_TOKEN(UNAUTHORIZED, "Token not found.", 401),
     NOT_FOUND_REFRESH_TOKEN(UNAUTHORIZED, "Refresh token for the user not found.", 401),
-    INVALID_AUTHENTICATION(UNAUTHORIZED, "잘못된 인증입니다.", 401),
+    INVALID_AUTHENTICATION(UNAUTHORIZED, "Wrong Authentication", 401),
     MALFORMED_TOKEN(UNAUTHORIZED, "Malformed Token", 401),
     EXPIRED_TOKEN(UNAUTHORIZED, "Expired Token", 401),
 

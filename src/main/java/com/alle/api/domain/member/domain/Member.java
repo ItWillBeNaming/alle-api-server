@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Entity
-@Table(name = "member")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -54,6 +53,8 @@ public class Member {
     private LocalDateTime birthDay;
 
     private String profileImageUrl;
+
+    private String phoneNumber;
 
     private LocalDateTime lastLoginDate;
 
