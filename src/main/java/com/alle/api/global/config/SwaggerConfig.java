@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +20,7 @@ public class SwaggerConfig {
 
         Info info = new Info()
                 .title("\"Olle API Document\"")
-                .description("Olleh API 문서 입니다.")
+                .description("Olle API 문서 입니다.")
                 .version("v0.0.1")
                 .license(license);;
 
@@ -30,6 +31,9 @@ public class SwaggerConfig {
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
                 .bearerFormat("JWT"));
+
+        Server server = new Server();
+        server.setUrl("http://43.201.194.56");
 
         return new OpenAPI()
                 .info(info)
