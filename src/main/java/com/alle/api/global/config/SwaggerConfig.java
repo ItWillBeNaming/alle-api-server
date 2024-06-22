@@ -10,6 +10,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
+
 @Configuration
 public class SwaggerConfig {
 
@@ -32,8 +34,7 @@ public class SwaggerConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT"));
 
-        Server server = new Server();
-        server.setUrl("http://43.201.194.56");
+
 
         return new OpenAPI()
                 .info(info)
