@@ -1,29 +1,20 @@
 package com.alle.api.domain.member.controller;
 
-import com.alle.api.domain.member.dto.request.*;
+import com.alle.api.domain.member.dto.request.UpdateReq;
 import com.alle.api.domain.member.dto.response.FindMemberResp;
 import com.alle.api.domain.member.service.MemberService;
 import com.alle.api.global.domain.Response;
-import com.alle.api.global.email.dto.request.AuthCodeVerificationRequest;
-import com.alle.api.global.email.dto.request.EmailRequest;
-import com.alle.api.global.email.service.EmailService;
-import com.alle.api.global.security.util.CookieUtils;
 import com.alle.api.global.security.CustomUserDetail;
-import com.alle.api.global.security.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -1,8 +1,6 @@
 package com.alle.api.domain.board.service.upperClass;
 
 
-import com.alle.api.domain.board.dto.request.BoardChildCommentReq;
-import com.alle.api.domain.board.dto.request.BoardParentCommentReq;
 import com.alle.api.domain.board.dto.request.BoardUpdateReq;
 import com.alle.api.domain.board.dto.request.BoardWriteReq;
 import com.alle.api.domain.board.dto.response.BoardResponse;
@@ -16,14 +14,11 @@ public interface BoardService {
 
      void update(CustomUserDetail customUserDetail, BoardUpdateReq boardUpdateReq);
 
-    void addParentComment(Long id, CustomUserDetail customUserDetail, BoardParentCommentReq boardParentCommentReq);
-
-    void addChildComment(Long id, CustomUserDetail customUserDetail, BoardChildCommentReq boardChildCommentReq);
 
     BoardResponse findOne(Long id);
 
     Page<BoardResponse> findAll(Pageable pageable);
 
-
     int like(Long id, CustomUserDetail userDetail);
+
 }

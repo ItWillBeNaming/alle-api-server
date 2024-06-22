@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -75,22 +73,4 @@ public class GlobalExceptionHandler {
         ExceptionResponse exceptionResponse = ExceptionResponse.fromError(ex);
         return ResponseEntity.status(exceptionResponse.httpStatus()).body(exceptionResponse);
     }
-
-
-    /**
-     * Security 관련 Exception Handling인데, 버전이 바뀌었나 import가 안된다.
-     */
-//    @ExceptionHandler(MalformedJwtException.class)
-//    public ResponseEntity<ExceptionResponse> handleMalformedJwtException() {
-//
-//        ExceptionResponse exceptionResponse = ExceptionResponse.from(MALFORMED_TOKEN);
-//        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
-//    }
-//
-//    @ExceptionHandler(ExpiredJwtException.class)
-//    public ResponseEntity<ExceptionResponse> handleExpiredJwtException() {
-//
-//        ExceptionResponse exceptionResponse = ExceptionResponse.from(EXPIRED_TOKEN);
-//        return ResponseEntity.status(exceptionResponse.getHttpStatus()).body(exceptionResponse);
-//    }
 }

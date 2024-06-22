@@ -1,4 +1,4 @@
-package com.alle.api.domain.board.dto.request;
+package com.alle.api.domain.boardComment.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

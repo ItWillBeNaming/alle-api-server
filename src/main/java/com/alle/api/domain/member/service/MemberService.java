@@ -40,7 +40,6 @@ public class MemberService {
     private final OAuth2RevokeService oAuth2RevokeService;
 
 
-    @Transactional
     public void create(SignUpReq request) {
         validateExistingEmail(request.getEmail());
         validateExistingNickname(request.getNickName());
@@ -184,5 +183,15 @@ public class MemberService {
             throw new MemberException(ExceptionCode.MEMBER_ALREADY_WITHDRAW);
         }
     }
+
+
+    public void checkEmail(String email) {
+        validateExistingEmail(email);
+    }
+
+    public void checkNickname(String nickname) {
+        validateExistingNickname(nickname);
+    }
+
 
 }
